@@ -1,8 +1,8 @@
-import { DashIcon } from '@radix-ui/react-icons';
 import { OTPInput, OTPInputContext } from 'input-otp';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+import { IconMinus } from '@tabler/icons-react';
 
 const InputOTP = React.forwardRef<React.ElementRef<typeof OTPInput>, React.ComponentPropsWithoutRef<typeof OTPInput>>(
     ({ className, containerClassName, ...props }, ref) => (
@@ -51,7 +51,7 @@ InputOTPSlot.displayName = 'InputOTPSlot';
 const InputOTPSeparator = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'>>(
     ({ ...props }, ref) => (
         <div ref={ref} role='separator' {...props}>
-            <DashIcon />
+            <IconMinus />
         </div>
     ),
 );
