@@ -1,4 +1,3 @@
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
@@ -8,16 +7,33 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useLoading } from '@/hooks/use-loading';
+import { useEffect } from 'react';
+import { Icon } from './icon';
+import { Skeleton } from './ui/skeleton';
 
 export function ThemeToggle() {
-    const { setTheme } = useTheme();
+    const { loading, startLoading } = useLoading();
+    const { theme, setTheme } = useTheme();
+
+    useEffect(() => {
+        // setTimeout(() => startLoading(), 1000);
+        startLoading();
+    }, []);
+
+    if (!loading) return <Skeleton className='size-9 border border-input' />;
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon'>
-                    <SunIcon className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
-                    <MoonIcon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
+                    {theme === 'system' ? (
+                        <Icon name='IconDeviceLaptop' />
+                    ) : theme === 'dark' ? (
+                        <Icon name='IconMoon' />
+                    ) : (
+                        <Icon name='IconSunLow' />
+                    )}
                     <span className='sr-only'>Toggle theme</span>
                 </Button>
             </DropdownMenuTrigger>

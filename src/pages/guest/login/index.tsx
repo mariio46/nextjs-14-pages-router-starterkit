@@ -1,45 +1,33 @@
-import { AppLayout } from '@/components/layouts/app-layout';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { GuestLayout } from '@/components/layouts/guest-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
 import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { NextPageWithLayout } from '@/pages/_app';
 import Link from 'next/link';
-import { ReactElement } from 'react';
 
 const Login: NextPageWithLayout = () => {
     return (
-        <div className='max-w-2xl min-w-[42rem]'>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Login</CardTitle>
-                    <CardDescription>
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Est, illo.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p>
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti perspiciatis aliquam sunt
-                        distinctio laboriosam numquam excepturi ullam ipsa laudantium provident, repellendus id,
-                        mollitia culpa possimus.
-                    </p>
-                </CardContent>
-                <CardFooter className='gap-4'>
-                    <Link href='/joke' className={cn(buttonVariants({ variant: 'outline' }))}>
-                        Joke
-                    </Link>
-                    <Link href='/' className={cn(buttonVariants({ variant: 'outline' }))}>
-                        Home
-                    </Link>
-                    <ThemeToggle />
-                </CardFooter>
-            </Card>
-        </div>
+        <>
+            <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam dolorem optio cumque nemo nihil
+                iusto nam consequatur veniam, eos, sunt quaerat! Aliquam officia obcaecati perspiciatis.
+            </p>
+            <Link href='/' className={cn(buttonVariants({ variant: 'outline' }))}>
+                Home
+            </Link>
+            <Link href='/register' className={cn(buttonVariants({ variant: 'outline' }))}>
+                Register
+            </Link>
+        </>
     );
 };
 
-Login.getLayout = function getLayout(page: ReactElement) {
-    return <AppLayout title='Login'>{page}</AppLayout>;
+Login.getLayout = function getLayout(page: React.ReactNode) {
+    return (
+        <RootLayout>
+            <GuestLayout title='Login'>{page}</GuestLayout>
+        </RootLayout>
+    );
 };
 
 export default Login;

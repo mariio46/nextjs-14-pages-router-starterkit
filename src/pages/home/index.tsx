@@ -1,16 +1,20 @@
 import { AppLayout } from '@/components/layouts/app-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { fetcher } from '@/lib/swr-fetcher';
 import { cn } from '@/lib/utils';
 import { ChuckNorrisData } from '@/types/chucknorris';
-import axios from 'axios';
 import Link from 'next/link';
 import { ReactElement } from 'react';
-import { NextPageWithLayout } from './_app';
+import useSWR from 'swr';
+import { NextPageWithLayout } from '../_app';
 
-// @ts-ignore
-const Home: NextPageWithLayout = ({ data }: { data: ChuckNorrisData }) => {
+const Home: NextPageWithLayout = () => {
+    const { data, isLoading, error } = useSWR<ChuckNorrisData>('https://api.chucknorris.io/jokes/random', fetcher);
+
     return (
         <div className='max-w-2xl min-w-[42rem]'>
             <Card>
@@ -21,15 +25,21 @@ const Home: NextPageWithLayout = ({ data }: { data: ChuckNorrisData }) => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p>{data.value}</p>
+                    {!error ? (
+                        <>
+                            {isLoading ? (
+                                <Skeleton className='h-4 w-[250px]' />
+                            ) : (
+                                <p className='text-sm text-muted-foreground'>{data?.value}</p>
+                            )}
+                        </>
+                    ) : (
+                        <p className='text-destructive font-medium animate-pulse text-sm'>
+                            {error.response.data.message} | {error.response.data.status}
+                        </p>
+                    )}
                 </CardContent>
                 <CardFooter className='gap-4'>
-                    <Link href='/about' className={cn(buttonVariants({ variant: 'outline' }))}>
-                        About
-                    </Link>
-                    <Link href='/joke' className={cn(buttonVariants({ variant: 'outline' }))}>
-                        Joke
-                    </Link>
                     <Link href='/login' className={cn(buttonVariants({ variant: 'outline' }))}>
                         Login
                     </Link>
@@ -44,14 +54,11 @@ const Home: NextPageWithLayout = ({ data }: { data: ChuckNorrisData }) => {
 };
 
 Home.getLayout = function getLayout(page: ReactElement) {
-    return <AppLayout title='Home'>{page}</AppLayout>;
+    return (
+        <RootLayout>
+            <AppLayout title='Home'>{page}</AppLayout>
+        </RootLayout>
+    );
 };
 
 export default Home;
-
-// This gets called on every request
-export async function getServerSideProps() {
-    const { data }: { data: ChuckNorrisData } = await axios.get('https://api.chucknorris.io/jokes/random');
-
-    return { props: { data } };
-}
