@@ -1,24 +1,22 @@
 import { GuestLayout } from '@/components/layouts/guest-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { LoginForm } from '@/components/pages/login/form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { NextPageWithLayout } from '@/pages/_app';
-import Link from 'next/link';
 
 const Login: NextPageWithLayout = () => {
     return (
-        <>
-            <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam dolorem optio cumque nemo nihil
-                iusto nam consequatur veniam, eos, sunt quaerat! Aliquam officia obcaecati perspiciatis.
-            </p>
-            <Link href='/' className={cn(buttonVariants({ variant: 'outline' }))}>
-                Home
-            </Link>
-            <Link href='/register' className={cn(buttonVariants({ variant: 'outline' }))}>
-                Register
-            </Link>
-        </>
+        <Card className='border-none shadow-none'>
+            <CardHeader>
+                <CardTitle>Login</CardTitle>
+                <CardDescription>
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vel, beatae.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <LoginForm />
+            </CardContent>
+        </Card>
     );
 };
 

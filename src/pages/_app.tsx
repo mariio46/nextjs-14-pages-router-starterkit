@@ -1,7 +1,10 @@
 import '@/styles/globals.css';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
-import type { ReactElement, ReactNode } from 'react';
+import { Figtree } from 'next/font/google';
+import { type ReactElement, type ReactNode } from 'react';
+
+const figtree = Figtree({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] });
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -12,8 +15,11 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-    // Use the layout defined at the page level, if available
     const getLayout = Component.getLayout || ((page) => page);
 
-    return getLayout(<Component {...pageProps} />);
+    return getLayout(
+        <div className={figtree.className}>
+            <Component {...pageProps} />
+        </div>,
+    );
 }

@@ -19,7 +19,7 @@ export function ThemeToggle() {
     useEffect(() => {
         // setTimeout(() => startLoading(), 1000);
         startLoading();
-    }, [loading]);
+    }, [loading, startLoading]);
 
     if (!loading) return <Skeleton className='size-9 border border-input' />;
 
