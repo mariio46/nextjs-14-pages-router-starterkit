@@ -19,7 +19,10 @@ import { z } from 'zod';
 interface LoginFormResponse extends ApiResponse {
     data: {
         user: User;
-        token: string;
+        access_token: {
+            token: string;
+            expires_at: string;
+        };
     };
 }
 
@@ -57,8 +60,9 @@ export const LoginForm = () => {
             }
 
             // set cookie
-            setCookie(TOKEN_COOKIE_KEY, data.data.token, {
-                maxAge: 60 * 60 * 24,
+            setCookie(TOKEN_COOKIE_KEY, data.data.access_token.token, {
+                maxAge: 24 * 60 * 60,
+                // expires: new Date(data.data.access_token.expires_at),
                 secure: process.env.NODE_ENV === 'production',
             });
 

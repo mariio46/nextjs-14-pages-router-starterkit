@@ -17,7 +17,7 @@ export const NavigationLink = ({ href, className, children }: NavLinkType) => {
         <Link
             href={href}
             className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground',
+                'inline-flex items-center justify-center rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 hover:bg-accent hover:text-accent-foreground font-semibold',
                 className,
                 active,
             )}>

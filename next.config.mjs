@@ -25,8 +25,13 @@ const nextConfig = {
                 permanent: true,
             },
             {
-                destination: '/profile',
-                source: '/dashboard/profile',
+                destination: '/settings',
+                source: '/dashboard/settings',
+                permanent: true,
+            },
+            {
+                destination: '/settings/account',
+                source: '/dashboard/settings/account',
                 permanent: true,
             },
         ];
@@ -51,8 +56,12 @@ const nextConfig = {
                 destination: '/guest/register',
             },
             {
-                source: '/profile',
-                destination: '/dashboard/profile',
+                source: '/settings',
+                destination: '/dashboard/settings',
+            },
+            {
+                source: '/settings/account',
+                destination: '/dashboard/settings/account',
             },
         ];
     },
