@@ -35,6 +35,8 @@ export const config = {
         '/dashboard',
         '/settings',
         '/settings/account',
+        '/settings/security',
+        '/settings/danger',
         '/login',
         '/register',
     ],

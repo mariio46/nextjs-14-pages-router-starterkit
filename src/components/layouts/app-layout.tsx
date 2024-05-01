@@ -10,6 +10,7 @@ export const AppLayout = ({ children, title }: { children: ReactElement; title: 
             </Head>
             <div>
                 <Navigation />
+                <div className='mt-20' />
                 <div className='border-b'>
                     <div className='h-60 flex items-center mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                         <h3 className='text-xl font-semibold'>{title} / Page</h3>

@@ -1,13 +1,9 @@
 import { cn } from '@/lib/utils';
-import { type Route } from 'next';
-import Link, { type LinkProps } from 'next/link';
+import type { NavigationProps } from '@/types/components';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-type SideNavigationLinkProps = {
-    href: Route | URL;
-    className?: string;
-    children: React.ReactNode;
-} & LinkProps;
+type SideNavigationLinkProps = NavigationProps;
 
 export const SideNavigationLink = ({ children, className, href, ...props }: SideNavigationLinkProps) => {
     const { asPath } = useRouter();

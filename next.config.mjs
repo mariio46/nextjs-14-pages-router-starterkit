@@ -34,6 +34,16 @@ const nextConfig = {
                 source: '/dashboard/settings/account',
                 permanent: true,
             },
+            {
+                destination: '/settings/security',
+                source: '/dashboard/settings/security',
+                permanent: true,
+            },
+            {
+                destination: '/settings/danger',
+                source: '/dashboard/settings/danger',
+                permanent: true,
+            },
         ];
     },
     /**
@@ -62,6 +72,14 @@ const nextConfig = {
             {
                 source: '/settings/account',
                 destination: '/dashboard/settings/account',
+            },
+            {
+                source: '/settings/security',
+                destination: '/dashboard/settings/security',
+            },
+            {
+                source: '/settings/danger',
+                destination: '/dashboard/settings/danger',
             },
         ];
     },

@@ -43,7 +43,7 @@ const Settings: NextPageWithLayout = () => {
                             <p className='mb-4 text-sm text-muted-foreground'>Last update password 2 minutes ago.</p>
                         </CardContent>
                         <CardFooter>
-                            <Link href='/' className={cn(buttonVariants(), 'w-full')}>
+                            <Link href='/settings/security' className={cn(buttonVariants(), 'w-full')}>
                                 Update Password
                             </Link>
                         </CardFooter>
@@ -59,7 +59,7 @@ const Settings: NextPageWithLayout = () => {
                             </p>
                         </CardContent>
                         <CardFooter>
-                            <Link href='/' className={cn(buttonVariants(), 'w-full')}>
+                            <Link href='/settings/danger' className={cn(buttonVariants(), 'w-full')}>
                                 Delete Account
                             </Link>
                         </CardFooter>

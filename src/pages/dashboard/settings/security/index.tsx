@@ -1,7 +1,7 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { UpdateAccountForm } from '@/components/pages/dashboard/settings/account/form';
+import { UpdatePasswordForm } from '@/components/pages/dashboard/settings/security/form';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,11 +10,11 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { NextPageWithLayout } from '@/pages/_app';
+import { type NextPageWithLayout } from '@/pages/_app';
 import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import Link from 'next/link';
 
-const Account: NextPageWithLayout = () => {
+const Security: NextPageWithLayout = () => {
     return (
         <>
             <Breadcrumb>
@@ -26,22 +26,22 @@ const Account: NextPageWithLayout = () => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Account</BreadcrumbPage>
+                        <BreadcrumbPage>Security</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
             <HeaderPrimary className='my-5 space-y-0.5'>
-                <HeaderPrimaryTitle className='text-base'>Account Information</HeaderPrimaryTitle>
+                <HeaderPrimaryTitle className='text-base'>Security</HeaderPrimaryTitle>
                 <HeaderPrimaryDescription>
-                    Update your account&apos;s profile information and email address.
+                    Make sure your account uses a long and random password to enhance security.
                 </HeaderPrimaryDescription>
             </HeaderPrimary>
 
             <section id='update-account-form'>
                 <div className='mx-auto max-w-7xl'>
                     <div className='max-w-xl'>
-                        <UpdateAccountForm />
+                        <UpdatePasswordForm />
                     </div>
                 </div>
             </section>
@@ -49,14 +49,14 @@ const Account: NextPageWithLayout = () => {
     );
 };
 
-Account.getLayout = function getLayout(page: React.ReactElement) {
+Security.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <AuthStateProvider>
-                <AuthLayout title='Account'>{page}</AuthLayout>
+                <AuthLayout title='Security'>{page}</AuthLayout>
             </AuthStateProvider>
         </RootLayout>
     );
 };
 
-export default Account;
+export default Security;

@@ -1,17 +1,14 @@
 import { cn } from '@/lib/utils';
-import { type Route } from 'next';
-import Link, { type LinkProps } from 'next/link';
-import { usePathname } from 'next/navigation';
+import type { NavigationProps } from '@/types/components';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-type NavLinkType = {
-    href: Route | URL;
-    className?: string;
-    children: React.ReactNode;
-} & LinkProps;
+type NavigationLinkProps = NavigationProps;
 
-export const NavigationLink = ({ href, className, children }: NavLinkType) => {
-    const pathname = usePathname();
-    const active: string = href == pathname ? 'bg-accent text-foreground' : '';
+export const NavigationLink = ({ href, className, children }: NavigationLinkProps) => {
+    const { asPath } = useRouter();
+    const boolean = href.toString() === '/' ? href.toString() === asPath : asPath.startsWith(href.toString());
+    const active: string = boolean ? 'bg-accent text-foreground' : '';
 
     return (
         <Link
