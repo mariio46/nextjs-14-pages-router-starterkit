@@ -3,39 +3,38 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { useLoading } from '@/hooks/use-loading';
 import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
+import { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type RegisterFormResponse = {
-    code: number;
+type RegisterFormResponse = ApiResponse & {
     data: string;
-    message: string;
 };
 
-const formSchema = z
-    .object({
-        name: z.string().min(3),
-        email: z.string().email(),
-        password: z.string().min(8),
-        password_confirmation: z.string().min(8),
-    })
-    .refine((data) => data.password === data.password_confirmation, {
-        message: "Password doesn't match.",
-        path: ['password_confirmation'],
-    });
+// prettier-ignore
+const registerFormSchema = z.object({
+    name: z.string().min(3),
+    email: z.string().email(),
+    password: z.string().min(8),
+    password_confirmation: z.string().min(8),
+}).refine((data) => data.password === data.password_confirmation, {
+    message: "Password doesn't match.",
+    path: ['password_confirmation'],
+});
+
+type RegisterFormFields = z.infer<typeof registerFormSchema>;
 
 export const RegisterForm = () => {
     const router = useRouter();
-    const { loading, startLoading, stopLoading } = useLoading();
     const { toast } = useToast();
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<RegisterFormFields>({
+        resolver: zodResolver(registerFormSchema),
         defaultValues: {
             name: '',
             email: '',
@@ -44,24 +43,34 @@ export const RegisterForm = () => {
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        startLoading();
+    const onSubmit = async (values: RegisterFormFields) => {
         try {
             const response = await axios.post('/register', values);
             const data: RegisterFormResponse = response.data;
             toast({
                 title: 'Success',
                 description: data.data,
+                duration: 2000,
             });
             router.push('/login');
             form.reset();
         } catch (e: any) {
-            const error = e.response?.data?.errors;
-            error?.name && form.setError('name', { message: error?.name[0] });
-            error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true });
-            error?.password && form.setError('password', { message: error?.password[0] });
-        } finally {
-            stopLoading();
+            if (isAxiosError(e)) {
+                if (e.response?.status === 422) {
+                    const error = e.response?.data.errors;
+                    error?.name && form.setError('name', { message: error?.name[0] });
+                    error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true });
+                    error?.password && form.setError('password', { message: error?.password[0] });
+                } else {
+                    toast({
+                        title: 'Failed',
+                        description: e.response?.data?.message ?? 'Server is busy. Try again later!',
+                        variant: 'destructive',
+                    });
+                }
+            } else {
+                console.error(e);
+            }
         }
     };
     return (
@@ -148,9 +157,9 @@ export const RegisterForm = () => {
                     <Link href='/login' className={cn(buttonVariants({ variant: 'ghost' }))}>
                         Already have an account
                     </Link>
-                    <Button type='submit' disabled={loading} aria-label='Submit'>
-                        {loading && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
-                        {!loading ? 'Submit' : 'Submitting...'}
+                    <Button type='submit' disabled={form.formState.isSubmitting} aria-label='Register'>
+                        {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
+                        {!form.formState.isSubmitting ? 'Register' : 'Registering...'}
                     </Button>
                 </div>
             </form>

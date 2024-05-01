@@ -3,6 +3,7 @@ import { ArticleLayout } from '@/components/articles/article-layout';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { ServerSidePagination } from '@/components/server-side-pagination';
+import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import type { ArticleResponse } from '@/types/article';
 import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
 
@@ -26,7 +27,9 @@ const ApiRender = ({ data }: InferGetServerSidePropsType<typeof getServerSidePro
 ApiRender.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AppLayout title='API Side'>{page}</AppLayout>
+            <AuthStateProvider>
+                <AppLayout title='API Side'>{page}</AppLayout>
+            </AuthStateProvider>
         </RootLayout>
     );
 };

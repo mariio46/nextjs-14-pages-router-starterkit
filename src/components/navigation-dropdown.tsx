@@ -39,9 +39,9 @@ export const NavigationDropdown = ({ user }: { user: User | null }) => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link href='/'>
+                    <Link href='/profile'>
                         <Icon name='IconBrandSpeedtest' className='mr-1.5 stroke-[1.3]' />
-                        Dashboard
+                        Profile
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

@@ -1,14 +1,13 @@
-import { AuthUser } from '@/components/auth-user';
 import { Counter } from '@/components/counter';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
+import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import React from 'react';
 
 const Home = () => {
     return (
         <div className='flex items-center gap-6 justify-center'>
             <Counter />
-            <AuthUser />
         </div>
     );
 };
@@ -16,7 +15,9 @@ const Home = () => {
 Home.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AppLayout title='Home'>{page}</AppLayout>
+            <AuthStateProvider>
+                <AppLayout title='Home'>{page}</AppLayout>
+            </AuthStateProvider>
         </RootLayout>
     );
 };

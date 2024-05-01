@@ -20,7 +20,7 @@ const Register: NextPageWithLayout = () => {
     );
 };
 
-Register.getLayout = function getLayout(page: React.ReactNode) {
+Register.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <GuestLayout title='Register'>{page}</GuestLayout>

@@ -3,6 +3,7 @@ import { ArticleLayout } from '@/components/articles/article-layout';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { ServerSidePagination } from '@/components/server-side-pagination';
+import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import type { ArticleResponse, ArticleType } from '@/types/article';
 import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
 import { NextPageWithLayout } from '../_app';
@@ -29,7 +30,9 @@ const ServerSide: NextPageWithLayout<ServerSidePageProps> = ({ data }: ServerSid
 ServerSide.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AppLayout title='Server Side'>{page}</AppLayout>
+            <AuthStateProvider>
+                <AppLayout title='Server Side'>{page}</AppLayout>
+            </AuthStateProvider>
         </RootLayout>
     );
 };

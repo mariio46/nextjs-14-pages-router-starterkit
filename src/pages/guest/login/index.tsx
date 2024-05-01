@@ -20,7 +20,7 @@ const Login: NextPageWithLayout = () => {
     );
 };
 
-Login.getLayout = function getLayout(page: React.ReactNode) {
+Login.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <GuestLayout title='Login'>{page}</GuestLayout>

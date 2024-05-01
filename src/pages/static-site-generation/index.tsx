@@ -2,6 +2,7 @@ import { ArticleBlock } from '@/components/articles/article-block';
 import { ArticleLayout } from '@/components/articles/article-layout';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
+import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import type { ArticleResponse } from '@/types/article';
 import { type GetStaticProps, type InferGetStaticPropsType } from 'next';
 
@@ -12,7 +13,9 @@ const StaticSiteGeneration = ({ data }: InferGetStaticPropsType<typeof getStatic
 StaticSiteGeneration.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AppLayout title='Static Site Generation'>{page}</AppLayout>
+            <AuthStateProvider>
+                <AppLayout title='Static Site Generation'>{page}</AppLayout>
+            </AuthStateProvider>
         </RootLayout>
     );
 };

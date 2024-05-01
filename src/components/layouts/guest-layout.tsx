@@ -1,23 +1,17 @@
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
-import { type ReactNode } from 'react';
+import { type ReactElement } from 'react';
+import { ApplicationLogo } from '../application-logo';
 import { ThemeToggle } from '../theme-toggle';
 
-export const GuestLayout = ({ children, title }: { children: ReactNode; title: string }) => {
+export const GuestLayout = ({ children, title }: { children: ReactElement; title: string }) => {
     return (
         <div className='min-h-screen flex flex-col items-center justify-center font-sans relative'>
             <Head>
                 <title>{`${title} / NextJS-14`}</title>
             </Head>
             <Link className='mb-5' href='/'>
-                <Image
-                    className='h-12 w-auto'
-                    src='https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500'
-                    alt='Your Company'
-                    width={40}
-                    height={32}
-                />
+                <ApplicationLogo className='h-12 w-auto' />
             </Link>
             <div className='max-w-xl min-w-[36rem]'>{children}</div>
             <div className='absolute bottom-2 right-2'>

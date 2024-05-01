@@ -13,9 +13,6 @@ export const useAuth = () => {
     const router = useRouter();
 
     const data = {};
-    // prettier-ignore-start
-    // const headers = { headers: { Authorization: `Bearer ${getCookie(TOKEN_COOKIE_KEY)}` } };
-    // prettier-ignore-end
 
     const clearCookieAndAuth = (): void => {
         deleteCookie(TOKEN_COOKIE_KEY);
@@ -34,11 +31,13 @@ export const useAuth = () => {
             if (error instanceof AxiosError && error.response?.status === 401) {
                 console.error(error);
                 clearCookieAndAuth();
-                router.push('/login');
+                if (router.pathname !== '/') router.push('/login');
+                router.reload();
             } else if (error instanceof AxiosError && error.response?.status !== 401) {
                 console.error(error);
                 clearCookieAndAuth();
-                router.push('/login');
+                if (router.pathname !== '/') router.push('/login');
+                router.reload();
             } else {
                 console.error(error);
             }

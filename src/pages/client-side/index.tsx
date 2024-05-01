@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SimplePagination } from '@/components/simple-pagination';
 import { fetcher } from '@/lib/swr-fetcher';
+import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import { ArticleResponse, ArticleType } from '@/types/article';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -42,7 +43,9 @@ const ClientSide: NextPageWithLayout = () => {
 ClientSide.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AppLayout title='Client Side'>{page}</AppLayout>
+            <AuthStateProvider>
+                <AppLayout title='Client Side'>{page}</AppLayout>
+            </AuthStateProvider>
         </RootLayout>
     );
 };
