@@ -58,7 +58,7 @@ const DangerArea: NextPageWithLayout = () => {
                                     Delete Account
                                 </Button>
                                 <Dialog open={openDialog} onOpenChange={toggleDialog}>
-                                    <DialogContent>
+                                    <DialogContent className='max-w-xl'>
                                         <DialogHeader>
                                             <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                                             <DialogDescription>

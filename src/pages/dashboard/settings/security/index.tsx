@@ -34,7 +34,8 @@ const Security: NextPageWithLayout = () => {
             <HeaderPrimary className='my-5 space-y-0.5'>
                 <HeaderPrimaryTitle className='text-base'>Security</HeaderPrimaryTitle>
                 <HeaderPrimaryDescription>
-                    Make sure your account uses a long and random password to enhance security.
+                    Use a strong and random password for better security.
+                    <span className='font-bold'>You&apos;ll be logged out after changing your password.</span>
                 </HeaderPrimaryDescription>
             </HeaderPrimary>
 

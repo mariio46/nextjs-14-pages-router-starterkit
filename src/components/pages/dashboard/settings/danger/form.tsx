@@ -1,101 +1,119 @@
-import { InputError } from '@/components/input-error';
+import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { useLoading } from '@/hooks/use-loading';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
+import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
 import useAuthState from '@/services/store/auth-state';
 import { ApiResponse } from '@/types/api-response';
-import { AxiosResponse, isAxiosError } from 'axios';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosResponse } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+interface DeleteAccountResponse extends ApiResponse {
+    data: null;
+}
+
+const deleteAccountFormSchema = z.object({
+    password: z.string().min(1, { message: 'Password is required.' }),
+});
+
+type DeleteAccountFormFields = z.infer<typeof deleteAccountFormSchema>;
 
 export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) => {
     const router = useRouter();
     const setUser = useAuthState((state) => state.setUser);
     const { toast } = useToast();
-    const { loading, startLoading, stopLoading } = useLoading();
-    const [errors, setErrors] = useState<{ password?: string[] }>({
-        password: [],
-    });
-    const [data, setData] = useState<{ password: string }>({
-        password: '',
+    const form = useForm<DeleteAccountFormFields>({
+        resolver: zodResolver(deleteAccountFormSchema),
+        defaultValues: {
+            password: '',
+        },
     });
 
-    const submit: React.FormEventHandler = async (e) => {
-        e.preventDefault();
-        startLoading();
+    const submit = async (values: DeleteAccountFormFields) => {
         try {
             // prettier-ignore
-            const {data: response}: AxiosResponse<ApiResponse> = await axios.post('/delete-account', data, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
+            const response: AxiosResponse<DeleteAccountResponse> = await axios.post('/delete-account', values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
 
-            if (response.code === 200) {
-                toast({
-                    title: 'Success',
-                    description: response.message,
-                    duration: 2000,
-                });
-
-                deleteCookie(TOKEN_COOKIE_KEY);
-
-                setTimeout(() => {
-                    setUser(null, false);
-                    router.reload();
-                }, 2100);
+            if (response.status === 200 && response.data.code === 200) {
+                handleWhenDeletingAccountIsSuccess(response.data);
+            } else {
+                console.log(response);
             }
         } catch (e: any) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 422) {
-                    const error: { password?: string[] } = e.response?.data.errors;
-                    setErrors({ ...errors, password: error.password });
-                } else {
-                    toast({
-                        title: 'Failed',
-                        description: e.response?.data?.message ?? 'Server is busy. Try again later!',
-                        variant: 'destructive',
-                    });
-                }
-            } else {
-                console.error(e);
-            }
-        } finally {
-            stopLoading();
+            const error: { password?: string[] } = e.response?.data.errors;
+            // prettier-ignore
+            handleAxiosError(e,toast, {
+                error_password: error?.password && form.setError('password', { message: error?.password[0] }, { shouldFocus: true }),
+            });
         }
+    };
+
+    const handleWhenDeletingAccountIsSuccess = (data: DeleteAccountResponse): void => {
+        closeDialog();
+
+        toast({
+            title: 'Success',
+            description: data.message,
+            duration: 2000,
+        });
+
+        deleteCookie(TOKEN_COOKIE_KEY);
+
+        setTimeout(() => {
+            setUser(null, false);
+            router.reload();
+        }, 2100);
     };
 
     return (
         <>
-            <form onSubmit={submit}>
-                <div>
-                    <Label htmlFor='password' className='sr-only'>
-                        Password
-                    </Label>
-                    <Input
-                        id='password'
-                        value={data.password}
-                        onChange={(e) => setData({ ...data, password: e.target.value })}
-                        autoFocus
-                        type='password'
-                        required
-                        placeholder='********'
-                        className='mt-1'
-                        autoComplete='current-password'
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(submit)} className='space-y-4'>
+                    <FormField
+                        control={form.control}
+                        name='password'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder='********'
+                                        type='password'
+                                        autoComplete='current-password'
+                                        aria-label='Current Password'
+                                        disabled={form.formState.isSubmitSuccessful}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
-                    <InputError message={errors?.password?.[0]} className='mt-1' />
-                </div>
-                <div className='flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-3'>
-                    <Button type='button' variant='outline' onClick={closeDialog}>
-                        Cancel
-                    </Button>
-                    <Button type='submit' variant='destructive' disabled={loading}>
-                        Confirm
-                    </Button>
-                </div>
-            </form>
+                    <div className='flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2'>
+                        <Button variant='outline' type='button' onClick={closeDialog}>
+                            Cancel
+                        </Button>
+                        <Button
+                            type='submit'
+                            variant='destructive'
+                            disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
+                            aria-label='Update'>
+                            {form.formState.isSubmitting && (
+                                <Icon name='IconLoader' className='size-4 me-1 animate-spin' />
+                            )}
+                            {!form.formState.isSubmitting ? 'Delete Account' : 'Deleting...'}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
         </>
     );
 };

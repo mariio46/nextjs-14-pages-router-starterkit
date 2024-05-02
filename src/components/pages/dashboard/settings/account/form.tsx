@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
+import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
 import useAuthState from '@/services/store/auth-state';
 import type { ApiResponse } from '@/types/api-response';
 import type { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError, type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -26,55 +27,59 @@ const updateAccountFormSchema = z.object({
 type UpdateAccountFormFields = z.infer<typeof updateAccountFormSchema>;
 
 export const UpdateAccountForm = () => {
-    const { user, setUser, check } = useAuthState();
+    const authUser = useAuthState((state) => state.user);
+    const setUser = useAuthState((state) => state.setUser);
+    const check = useAuthState((state) => state.check);
+
     const { toast } = useToast();
+
     const form = useForm<UpdateAccountFormFields>({
         resolver: zodResolver(updateAccountFormSchema),
         defaultValues: {
-            name: user?.name,
-            email: user?.email,
+            name: authUser?.name,
+            email: authUser?.email,
         },
     });
 
-    const submit = async (values: UpdateAccountFormFields) => {
+    const submit = async (values: UpdateAccountFormFields): Promise<void> => {
         try {
-            const { data }: AxiosResponse<UpdateAccountResponse> = await axios.post(
-                '/account',
-                values,
-                getAxiosHeadersWithToken(TOKEN_COOKIE_KEY),
-            );
+            // prettier-ignore
+            const response: AxiosResponse<UpdateAccountResponse> = await axios.post('/account', values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY));
 
-            const user = data.data;
-
-            setUser(user, check);
-
-            form.reset({
-                name: user.name,
-                email: user.email,
-            });
-
-            toast({
-                title: 'Success',
-                description: data.message,
-                duration: 2000,
-            });
-        } catch (e: any) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 422) {
-                    const error: { name?: string[]; email?: string[] } = e.response?.data.errors;
-                    error?.name && form.setError('name', { message: error?.name[0] });
-                    error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true });
-                } else {
-                    toast({
-                        title: 'Failed',
-                        description: e.response?.data?.message ?? 'Server is busy. Try again later!',
-                        variant: 'destructive',
-                    });
-                }
+            if (response.status === 200 && response.data.code === 200) {
+                handleWhenUpdatingAccountIsSuccess(response.data);
             } else {
-                console.error(e);
+                console.log(response);
             }
+        } catch (e: any) {
+            const error: { name?: string[]; email?: string[] } = e.response?.data.errors;
+            // prettier-ignore
+            handleAxiosError(e, toast, {
+                error_name :error?.name && form.setError('name', { message: error?.name[0] }),
+                error_email :error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
+            })
         }
+    };
+
+    const handleWhenUpdatingAccountIsSuccess = (data: UpdateAccountResponse): void => {
+        // New user from API
+        const user = data.data;
+
+        // Set old User to a new User from API
+        setUser(user, check);
+
+        // Reset form and override the default value with new User from API
+        form.reset({
+            name: user.name,
+            email: user.email,
+        });
+
+        // Toast for showing that updating account is success
+        toast({
+            title: 'Success',
+            description: data.message,
+            duration: 2000,
+        });
     };
 
     return (
@@ -93,6 +98,7 @@ export const UpdateAccountForm = () => {
                                     autoFocus
                                     type='text'
                                     aria-label='Name'
+                                    disabled={form.formState.isSubmitting}
                                     {...field}
                                 />
                             </FormControl>
@@ -112,6 +118,7 @@ export const UpdateAccountForm = () => {
                                     autoComplete='email'
                                     type='email'
                                     aria-label='Email'
+                                    disabled={form.formState.isSubmitting}
                                     {...field}
                                 />
                             </FormControl>
@@ -120,7 +127,10 @@ export const UpdateAccountForm = () => {
                     )}
                 />
                 <div>
-                    <Button type='submit' disabled={form.formState.isSubmitting} aria-label='Update'>
+                    <Button
+                        type='submit'
+                        disabled={!form.formState.isDirty || form.formState.isSubmitting}
+                        aria-label='Update'>
                         {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
                         {!form.formState.isSubmitting ? 'Update' : 'Updating...'}
                     </Button>
