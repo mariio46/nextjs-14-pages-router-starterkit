@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
+import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { cn } from '@/lib/utils';
-import { ApiResponse } from '@/types/api-response';
-import { User } from '@/types/user';
+import useAuthState from '@/services/store/auth-state';
+import type { ApiResponse } from '@/types/api-response';
+import type { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse, isAxiosError } from 'axios';
+import { type AxiosResponse } from 'axios';
 import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,7 +21,10 @@ import { z } from 'zod';
 interface LoginFormResponse extends ApiResponse {
     data: {
         user: User;
-        token: string;
+        access_token: {
+            token: string;
+            expires_at: string;
+        };
     };
 }
 
@@ -32,6 +37,7 @@ type LoginFormType = z.infer<typeof loginFormSchema>;
 
 export const LoginForm = () => {
     const { toast } = useToast();
+    const setUser = useAuthState((state) => state.setUser);
     const router = useRouter();
     const form = useForm<LoginFormType>({
         resolver: zodResolver(loginFormSchema),
@@ -41,46 +47,43 @@ export const LoginForm = () => {
     const submit = async (values: LoginFormType) => {
         try {
             const { data }: AxiosResponse<LoginFormResponse> = await axios.post('/login', values);
-
-            toast({
-                title: 'Success',
-                description: data.message,
-                duration: 2000,
-            });
-
-            // Reset Form
-            form.reset();
-
-            // will execute if has cookie, it will destroy due to avoid duplicate cookie with same key
-            if (hasCookie(TOKEN_COOKIE_KEY)) {
-                deleteCookie(TOKEN_COOKIE_KEY);
-            }
-
-            // set cookie
-            setCookie(TOKEN_COOKIE_KEY, data.data.token, {
-                maxAge: 60 * 60 * 24,
-                secure: process.env.NODE_ENV === 'production',
-            });
-
-            // reload for trigger the middleware
-            router.reload();
+            handleWhenLoginSuccess(data);
         } catch (e: any) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 422) {
-                    const error = e.response?.data?.errors;
-                    error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true });
-                    error?.password && form.setError('password', { message: error?.password[0] });
-                } else {
-                    toast({
-                        title: 'Failed',
-                        description: e.response?.data?.message ?? 'Server is busy. Try again later!',
-                        variant: 'destructive',
-                    });
-                }
-            } else {
-                console.error(e);
-            }
+            const error: { email?: string[]; password?: string[] } = e.response?.data?.errors;
+            // prettier-ignore
+            handleAxiosError(e, toast, {
+                error_email: error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
+                error_password: error?.password && form.setError('password', { message: error?.password[0] }),
+            });
         }
+    };
+
+    const handleWhenLoginSuccess = (data: LoginFormResponse) => {
+        toast({
+            title: 'Success',
+            description: data.message,
+            duration: 2000,
+        });
+
+        // Reset Form
+        form.reset();
+
+        // will execute if has cookie, it will destroy due to avoid duplicate cookie with same key
+        if (hasCookie(TOKEN_COOKIE_KEY)) {
+            deleteCookie(TOKEN_COOKIE_KEY);
+        }
+
+        // set cookie
+        setCookie(TOKEN_COOKIE_KEY, data.data.access_token.token, {
+            maxAge: 24 * 60 * 60,
+            // expires: new Date(data.data.access_token.expires_at),
+            secure: process.env.NODE_ENV === 'production',
+        });
+
+        setUser(data.data.user, true);
+
+        // reload for trigger the middleware
+        setTimeout(() => router.reload(), 2100);
     };
 
     return (
@@ -99,6 +102,7 @@ export const LoginForm = () => {
                                     autoFocus
                                     type='email'
                                     aria-label='Email'
+                                    disabled={form.formState.isSubmitSuccessful}
                                     {...field}
                                 />
                             </FormControl>
@@ -118,6 +122,7 @@ export const LoginForm = () => {
                                     type='password'
                                     autoComplete='password'
                                     aria-label='Password'
+                                    disabled={form.formState.isSubmitSuccessful}
                                     {...field}
                                 />
                             </FormControl>
@@ -129,7 +134,10 @@ export const LoginForm = () => {
                     <Link href='/register' className={cn(buttonVariants({ variant: 'ghost' }))}>
                         Register
                     </Link>
-                    <Button type='submit' disabled={form.formState.isSubmitting} aria-label='Login'>
+                    <Button
+                        type='submit'
+                        disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
+                        aria-label='Login'>
                         {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
                         {!form.formState.isSubmitting ? 'Login' : 'Login...'}
                     </Button>

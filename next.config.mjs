@@ -25,8 +25,23 @@ const nextConfig = {
                 permanent: true,
             },
             {
-                destination: '/profile',
-                source: '/dashboard/profile',
+                destination: '/settings',
+                source: '/dashboard/settings',
+                permanent: true,
+            },
+            {
+                destination: '/settings/account',
+                source: '/dashboard/settings/account',
+                permanent: true,
+            },
+            {
+                destination: '/settings/security',
+                source: '/dashboard/settings/security',
+                permanent: true,
+            },
+            {
+                destination: '/settings/danger',
+                source: '/dashboard/settings/danger',
                 permanent: true,
             },
         ];
@@ -51,8 +66,20 @@ const nextConfig = {
                 destination: '/guest/register',
             },
             {
-                source: '/profile',
-                destination: '/dashboard/profile',
+                source: '/settings',
+                destination: '/dashboard/settings',
+            },
+            {
+                source: '/settings/account',
+                destination: '/dashboard/settings/account',
+            },
+            {
+                source: '/settings/security',
+                destination: '/dashboard/settings/security',
+            },
+            {
+                source: '/settings/danger',
+                destination: '/dashboard/settings/danger',
             },
         ];
     },

@@ -24,7 +24,7 @@ export const NavigationDropdown = ({ user }: { user: User | null }) => {
                     <AvatarFallback>{acronym(user?.name!)}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-full min-w-[8rem]'>
+            <DropdownMenuContent align='end' className='w-full min-w-[8rem] z-[61]'>
                 <DropdownMenuLabel>
                     <div className='relative flex items-center font-normal'>
                         <Avatar className='size-8'>
@@ -39,13 +39,13 @@ export const NavigationDropdown = ({ user }: { user: User | null }) => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link href='/profile'>
+                    <Link href='/dashboard'>
                         <Icon name='IconBrandSpeedtest' className='mr-1.5 stroke-[1.3]' />
-                        Profile
+                        Dashboard
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href='/'>
+                    <Link href='/settings'>
                         <Icon name='IconSettings' className='mr-1.5 stroke-[1.3]' />
                         Settings
                     </Link>

@@ -2,7 +2,6 @@ import { Counter } from '@/components/counter';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { AuthStateProvider } from '@/services/providers/auth-state-provider';
-import React from 'react';
 
 const Home = () => {
     return (

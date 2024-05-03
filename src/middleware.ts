@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
 
     if (cookie && is_guest_route) {
         console.info('Statement 1 Trigger');
-        return NextResponse.redirect(new URL('/profile', request.nextUrl));
+        return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
     }
 
     if (!cookie && !is_guest_route) {
@@ -32,7 +32,11 @@ export const config = {
         '/server-side', 
         '/static-site-generation',
         '/api-render',
-        '/profile',
+        '/dashboard',
+        '/settings',
+        '/settings/account',
+        '/settings/security',
+        '/settings/danger',
         '/login',
         '/register',
     ],
