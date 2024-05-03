@@ -8,7 +8,7 @@ import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
 import useAuthState from '@/services/store/auth-state';
-import { ApiResponse } from '@/types/api-response';
+import type { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosResponse } from 'axios';
 import { deleteCookie } from 'cookies-next';
@@ -27,15 +27,20 @@ const deleteAccountFormSchema = z.object({
 type DeleteAccountFormFields = z.infer<typeof deleteAccountFormSchema>;
 
 export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) => {
-    const router = useRouter();
     const setUser = useAuthState((state) => state.setUser);
+
+    const router = useRouter();
     const { toast } = useToast();
+
     const form = useForm<DeleteAccountFormFields>({
         resolver: zodResolver(deleteAccountFormSchema),
         defaultValues: {
             password: '',
         },
     });
+
+    // prettier-ignore
+    const disabled: boolean = !form.formState.isDirty ||form.formState.isSubmitting || form.formState.isSubmitSuccessful;
 
     const submit = async (values: DeleteAccountFormFields) => {
         try {
@@ -101,11 +106,7 @@ export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) 
                         <Button variant='outline' type='button' onClick={closeDialog}>
                             Cancel
                         </Button>
-                        <Button
-                            type='submit'
-                            variant='destructive'
-                            disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
-                            aria-label='Update'>
+                        <Button type='submit' variant='destructive' disabled={disabled} aria-label='Update'>
                             {form.formState.isSubmitting && (
                                 <Icon name='IconLoader' className='size-4 me-1 animate-spin' />
                             )}

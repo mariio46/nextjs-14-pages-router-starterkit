@@ -19,9 +19,19 @@ interface UpdateAccountResponse extends ApiResponse {
     data: User;
 }
 
+// prettier-ignore
 const updateAccountFormSchema = z.object({
-    name: z.string().min(3),
-    email: z.string().email().toLowerCase(),
+    name: z.string().min(3, { 
+            message: 'The name field must be at least 3 characters.' 
+        }),
+    username: z.string().min(5, {
+            message: 'The username field must be at least 5 characters.',
+        }).max(25, {
+            message: 'The username field must not be greater than 25 characters.',
+        }).toLowerCase(),
+    email: z.string().email({ 
+            message: 'The email field must be a valid email address.' 
+        }).toLowerCase(),
 });
 
 type UpdateAccountFormFields = z.infer<typeof updateAccountFormSchema>;
@@ -37,6 +47,7 @@ export const UpdateAccountForm = () => {
         resolver: zodResolver(updateAccountFormSchema),
         defaultValues: {
             name: authUser?.name,
+            username: authUser?.username,
             email: authUser?.email,
         },
     });
@@ -52,10 +63,11 @@ export const UpdateAccountForm = () => {
                 console.log(response);
             }
         } catch (e: any) {
-            const error: { name?: string[]; email?: string[] } = e.response?.data.errors;
+            const error: { name?: string[]; username?: string[]; email?: string[] } = e.response?.data.errors;
             // prettier-ignore
             handleAxiosError(e, toast, {
                 error_name :error?.name && form.setError('name', { message: error?.name[0] }),
+                error_username :error?.username && form.setError('username', { message: error?.username[0] }),
                 error_email :error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
             })
         }
@@ -71,6 +83,7 @@ export const UpdateAccountForm = () => {
         // Reset form and override the default value with new User from API
         form.reset({
             name: user.name,
+            username: user.username,
             email: user.email,
         });
 
@@ -98,6 +111,28 @@ export const UpdateAccountForm = () => {
                                     autoFocus
                                     type='text'
                                     aria-label='Name'
+                                    // required
+                                    disabled={form.formState.isSubmitting}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='username'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Username</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder='Username'
+                                    autoComplete='username'
+                                    type='text'
+                                    aria-label='Username'
+                                    // required
                                     disabled={form.formState.isSubmitting}
                                     {...field}
                                 />
@@ -118,6 +153,7 @@ export const UpdateAccountForm = () => {
                                     autoComplete='email'
                                     type='email'
                                     aria-label='Email'
+                                    // required
                                     disabled={form.formState.isSubmitting}
                                     {...field}
                                 />

@@ -54,6 +54,9 @@ export const UpdatePasswordForm = () => {
         },
     });
 
+    // prettier-ignore
+    const disabled: boolean = !form.formState.isDirty || form.formState.isSubmitting || form.formState.isSubmitSuccessful;
+
     const submit = async (values: UpdatePasswordFormFields): Promise<void> => {
         try {
             // prettier-ignore
@@ -153,10 +156,7 @@ export const UpdatePasswordForm = () => {
                     )}
                 />
                 <div>
-                    <Button
-                        type='submit'
-                        disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
-                        aria-label='Update'>
+                    <Button type='submit' disabled={disabled} aria-label='Update'>
                         {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
                         {!form.formState.isSubmitting ? 'Update' : 'Updating...'}
                     </Button>

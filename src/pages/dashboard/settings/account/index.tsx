@@ -34,7 +34,8 @@ const Account: NextPageWithLayout = () => {
             <HeaderPrimary className='my-5 space-y-0.5'>
                 <HeaderPrimaryTitle className='text-base'>Account Information</HeaderPrimaryTitle>
                 <HeaderPrimaryDescription>
-                    Update your account&apos;s profile information and email address.
+                    Update your name, username, and email to update your profile information.
+                    <span className='font-bold'>You can submit form if you make a changes.</span>
                 </HeaderPrimaryDescription>
             </HeaderPrimary>
 
