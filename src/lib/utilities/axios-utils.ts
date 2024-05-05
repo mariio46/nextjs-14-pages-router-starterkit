@@ -1,5 +1,8 @@
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 import { isAxiosError, type AxiosError } from 'axios';
+import { getCookie, hasCookie } from 'cookies-next';
+import { IncomingMessage, ServerResponse } from 'http';
+import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 
 type ToasterToast = ToastProps & {
     id: string;
@@ -39,4 +42,24 @@ export const handleAxiosError = (e: any, toast: ToasterProps, { ...props }: hand
     } else {
         console.error(e);
     }
+};
+
+export const getServerSideCookieToken = (
+    token: string,
+    options?: {
+        req: IncomingMessage & {
+            cookies: NextApiRequestCookies;
+        };
+        res: ServerResponse;
+    },
+): {} | undefined => {
+    if (hasCookie(token, { req: options?.req, res: options?.res })) {
+        return {
+            headers: {
+                Authorization: `Bearer ${getCookie(token, { req: options?.req, res: options?.res })}`,
+            },
+        };
+    }
+
+    return undefined;
 };

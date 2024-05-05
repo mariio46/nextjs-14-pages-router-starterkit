@@ -20,14 +20,6 @@ export const Navigation = () => {
                     <div className='flex'>
                         <div className='flex items-center gap-1.5'>
                             <NavigationLink href='/'>Home</NavigationLink>
-                            {check && (
-                                <>
-                                    <NavigationLink href='/client-side'>CSR</NavigationLink>
-                                    <NavigationLink href='/server-side'>SSR</NavigationLink>
-                                    <NavigationLink href='/static-site-generation'>SSG</NavigationLink>
-                                    <NavigationLink href='/api-render'>API</NavigationLink>
-                                </>
-                            )}
                         </div>
                         <Separator orientation='vertical' className='shrink-0 bg-border w-[1.1px] mx-4 h-9' />
                         <div className='flex items-center gap-4'>

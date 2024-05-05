@@ -14,6 +14,10 @@ export const SideNavigation = () => {
                         <Icon name='IconSettings' />
                         Settings
                     </SideNavigationLink>
+                    <SideNavigationLink href='/users'>
+                        <Icon name='IconUsersGroup' />
+                        Users
+                    </SideNavigationLink>
                 </ul>
             </div>
         </aside>

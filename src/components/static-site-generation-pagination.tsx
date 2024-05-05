@@ -1,5 +1,5 @@
 import { cn, getPageNumberFromUrl } from '@/lib/utils';
-import type { Links, Meta } from '@/types/article';
+import { Links, Meta } from '@/types/api-response';
 import Link from 'next/link';
 import { Icon } from './icon';
 import { Button, buttonVariants } from './ui/button';
