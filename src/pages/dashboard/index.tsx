@@ -1,7 +1,8 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { AuthStateProvider } from '@/services/providers/auth-state-provider';
+import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
+import { GetServerSideProps } from 'next';
 import { NextPageWithLayout } from '../_app';
 
 const Dashboard: NextPageWithLayout = () => {
@@ -18,11 +19,16 @@ const Dashboard: NextPageWithLayout = () => {
 Dashboard.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthStateProvider>
-                <AuthLayout title='Dashboard'>{page}</AuthLayout>
-            </AuthStateProvider>
+            <AuthLayout title='Dashboard'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
 export default Dashboard;
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await getServerSideAuthUserData({ req, res });
+    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+
+    return { props: {} };
+}) satisfies GetServerSideProps;

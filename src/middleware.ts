@@ -28,7 +28,8 @@ export function middleware(request: NextRequest) {
  */
 export const config = {
     matcher: [
-        '/dashboard',
+        // '/api/authorization/user-token-validation',
+        // '/dashboard',
         '/settings',
         '/settings/account',
         '/settings/security',

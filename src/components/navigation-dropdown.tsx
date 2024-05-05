@@ -9,11 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { acronym } from '@/lib/utils';
-import { User } from '@/types/user';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import Link from 'next/link';
 import { Icon } from './icon';
 
-export const NavigationDropdown = ({ user }: { user: User | null }) => {
+export const NavigationDropdown = () => {
+    const user = useAuthUserState((state) => state.user);
     const { logout, loading } = useAuth();
 
     return (

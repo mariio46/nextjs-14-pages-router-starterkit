@@ -14,8 +14,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToggleDialog } from '@/hooks/use-toggle-dialog';
+import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
 import { NextPageWithLayout } from '@/pages/_app';
-import { AuthStateProvider } from '@/services/providers/auth-state-provider';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 const DangerArea: NextPageWithLayout = () => {
@@ -82,11 +83,16 @@ const DangerArea: NextPageWithLayout = () => {
 DangerArea.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthStateProvider>
-                <AuthLayout title='Danger Area'>{page}</AuthLayout>
-            </AuthStateProvider>
+            <AuthLayout title='Danger Area'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
 export default DangerArea;
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await getServerSideAuthUserData({ req, res });
+    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+
+    return { props: {} };
+}) satisfies GetServerSideProps;

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import Link from 'next/link';
 import { ApplicationLogo } from './application-logo';
 import { NavigationDropdown } from './navigation-dropdown';
@@ -9,7 +9,8 @@ import { buttonVariants } from './ui/button';
 import { Separator } from './ui/separator';
 
 export const Navigation = () => {
-    const { user, check } = useAuthState();
+    const check = useAuthUserState((state) => state.check);
+
     return (
         <header className='relative z-[60] hidden lg:block'>
             <nav className='fixed left-1/2 top-0 w-full -translate-x-1/2 bg-background py-4'>
@@ -25,7 +26,7 @@ export const Navigation = () => {
                         <div className='flex items-center gap-4'>
                             <ThemeToggle />
                             {check ? (
-                                <NavigationDropdown user={user} />
+                                <NavigationDropdown />
                             ) : (
                                 <>
                                     <Link href='/login' className={cn(buttonVariants({ variant: 'outline' }))}>

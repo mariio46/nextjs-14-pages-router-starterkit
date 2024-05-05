@@ -4,14 +4,21 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
 import { cn } from '@/lib/utils';
 import { NextPageWithLayout } from '@/pages/_app';
-import { AuthStateProvider } from '@/services/providers/auth-state-provider';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 const Settings: NextPageWithLayout = () => {
-    const user = useAuthState((state) => state.user);
+    const user = useAuthUserState((state) => {
+        return {
+            last_updated_account: state.user?.last_updated_account,
+            last_updated_password: state.user?.last_updated_password,
+        };
+    });
+
     return (
         <>
             <HeaderPrimary>
@@ -29,7 +36,7 @@ const Settings: NextPageWithLayout = () => {
                         </CardHeader>
                         <CardContent className='h-[90px] flex flex-col'>
                             <p className='mb-4 flex-1 text-sm text-muted-foreground line-clamp-2'>
-                                {user?.last_updated_account}
+                                {user.last_updated_account}
                             </p>
                         </CardContent>
                         <CardFooter>
@@ -82,11 +89,16 @@ const Settings: NextPageWithLayout = () => {
 Settings.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthStateProvider>
-                <AuthLayout title='Settings'>{page}</AuthLayout>
-            </AuthStateProvider>
+            <AuthLayout title='Settings'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
 export default Settings;
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await getServerSideAuthUserData({ req, res });
+    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+
+    return { props: {} };
+}) satisfies GetServerSideProps;

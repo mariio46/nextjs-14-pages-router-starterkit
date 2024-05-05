@@ -3,11 +3,11 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { userColumns } from '@/components/pages/dashboard/users/column';
 import { DataTable } from '@/components/pages/dashboard/users/data-table';
+import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { getServerSideCookieToken } from '@/lib/utilities/axios-utils';
 import { NextPageWithLayout } from '@/pages/_app';
-import { AuthStateProvider } from '@/services/providers/auth-state-provider';
 import { User } from '@/types/api/feature/users';
 import { AxiosError, AxiosResponse } from 'axios';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -34,9 +34,7 @@ const TanStackUserTable: NextPageWithLayout<TanStackUserTablePageProps> = ({ dat
 TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthStateProvider>
-                <AuthLayout title='TanStack Users Table'>{page}</AuthLayout>
-            </AuthStateProvider>
+            <AuthLayout title='TanStack Users Table'>{page}</AuthLayout>
         </RootLayout>
     );
 };
@@ -44,6 +42,9 @@ TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
 export default TanStackUserTable;
 
 export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await getServerSideAuthUserData({ req, res });
+    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+
     // prettier-ignore
     const data = await axios
         .get('/users', getServerSideCookieToken(TOKEN_COOKIE_KEY, { req, res }))
