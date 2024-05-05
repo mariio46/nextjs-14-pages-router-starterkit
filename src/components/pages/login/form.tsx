@@ -7,7 +7,7 @@ import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { cn } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import type { ApiResponse } from '@/types/api-response';
 import type { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +37,11 @@ type LoginFormType = z.infer<typeof loginFormSchema>;
 
 export const LoginForm = () => {
     const { toast } = useToast();
-    const setUser = useAuthState((state) => state.setUser);
+
+    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const setAuthUser = useAuthUserState((state) => state.setUser);
+    const isValidating = useAuthUserState((state) => state.isValidating);
+
     const router = useRouter();
     const form = useForm<LoginFormType>({
         resolver: zodResolver(loginFormSchema),
@@ -80,10 +84,15 @@ export const LoginForm = () => {
             secure: process.env.NODE_ENV === 'production',
         });
 
-        setUser(data.data.user, true);
+        // update auth user state
+        setAuthUser(data.data.user);
+
+        // trigger useEffect in _app.tsx to update auth user state once again
+        setAuthCheck(true);
+        isValidating(false);
 
         // reload for trigger the middleware
-        setTimeout(() => router.reload(), 2100);
+        router.push('/dashboard');
     };
 
     return (

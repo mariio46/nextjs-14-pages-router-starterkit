@@ -7,7 +7,7 @@ import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import type { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosResponse } from 'axios';
@@ -27,7 +27,8 @@ const deleteAccountFormSchema = z.object({
 type DeleteAccountFormFields = z.infer<typeof deleteAccountFormSchema>;
 
 export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) => {
-    const setUser = useAuthState((state) => state.setUser);
+    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const isValidating = useAuthUserState((state) => state.isValidating);
 
     const router = useRouter();
     const { toast } = useToast();
@@ -67,15 +68,13 @@ export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) 
         toast({
             title: 'Success',
             description: data.message,
-            duration: 2000,
         });
 
         deleteCookie(TOKEN_COOKIE_KEY);
 
-        setTimeout(() => {
-            setUser(null, false);
-            router.reload();
-        }, 2100);
+        setAuthCheck(false);
+        isValidating(false);
+        router.push('/');
     };
 
     return (

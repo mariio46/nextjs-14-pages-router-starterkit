@@ -1,4 +1,4 @@
-import type { Links, Meta } from '@/types/article';
+import type { Links, Meta } from '@/types/api-response';
 import { Icon } from './icon';
 import { Button } from './ui/button';
 

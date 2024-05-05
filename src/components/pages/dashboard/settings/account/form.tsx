@@ -7,7 +7,7 @@ import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import type { ApiResponse } from '@/types/api-response';
 import type { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,9 +37,14 @@ const updateAccountFormSchema = z.object({
 type UpdateAccountFormFields = z.infer<typeof updateAccountFormSchema>;
 
 export const UpdateAccountForm = () => {
-    const authUser = useAuthState((state) => state.user);
-    const setUser = useAuthState((state) => state.setUser);
-    const check = useAuthState((state) => state.check);
+    const authUser = useAuthUserState((state) => {
+        return {
+            name: state.user?.name,
+            username: state.user?.username,
+            email: state.user?.email,
+        };
+    });
+    const setAuthUser = useAuthUserState((state) => state.setUser);
 
     const { toast } = useToast();
 
@@ -78,7 +83,7 @@ export const UpdateAccountForm = () => {
         const user = data.data;
 
         // Set old User to a new User from API
-        setUser(user, check);
+        setAuthUser(user);
 
         // Reset form and override the default value with new User from API
         form.reset({

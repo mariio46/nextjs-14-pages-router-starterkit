@@ -7,8 +7,8 @@ import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
-import { ApiResponse } from '@/types/api-response';
+import { useAuthUserState } from '@/services/store/auth-user-state';
+import type { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosResponse } from 'axios';
 import { deleteCookie } from 'cookies-next';
@@ -42,9 +42,12 @@ const updatePasswordFormSchema = z.object({
 type UpdatePasswordFormFields = z.infer<typeof updatePasswordFormSchema>;
 
 export const UpdatePasswordForm = () => {
-    const setUser = useAuthState((state) => state.setUser);
+    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const isValidating = useAuthUserState((state) => state.isValidating);
+
     const router = useRouter();
     const { toast } = useToast();
+
     const form = useForm<UpdatePasswordFormFields>({
         resolver: zodResolver(updatePasswordFormSchema),
         defaultValues: {
@@ -83,14 +86,13 @@ export const UpdatePasswordForm = () => {
         toast({
             title: 'Success',
             description: data.message,
-            duration: 2000,
         });
 
         deleteCookie(TOKEN_COOKIE_KEY);
 
-        setTimeout(() => setUser(null, false), 2100);
-
-        setTimeout(() => router.reload(), 2200);
+        setAuthCheck(false);
+        isValidating(false);
+        router.push('/');
     };
     return (
         <Form {...form}>

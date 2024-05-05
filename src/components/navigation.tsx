@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import useAuthState from '@/services/store/auth-state';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import Link from 'next/link';
 import { ApplicationLogo } from './application-logo';
 import { NavigationDropdown } from './navigation-dropdown';
@@ -9,7 +9,8 @@ import { buttonVariants } from './ui/button';
 import { Separator } from './ui/separator';
 
 export const Navigation = () => {
-    const { user, check } = useAuthState();
+    const check = useAuthUserState((state) => state.check);
+
     return (
         <header className='relative z-[60] hidden lg:block'>
             <nav className='fixed left-1/2 top-0 w-full -translate-x-1/2 bg-background py-4'>
@@ -20,20 +21,12 @@ export const Navigation = () => {
                     <div className='flex'>
                         <div className='flex items-center gap-1.5'>
                             <NavigationLink href='/'>Home</NavigationLink>
-                            {check && (
-                                <>
-                                    <NavigationLink href='/client-side'>CSR</NavigationLink>
-                                    <NavigationLink href='/server-side'>SSR</NavigationLink>
-                                    <NavigationLink href='/static-site-generation'>SSG</NavigationLink>
-                                    <NavigationLink href='/api-render'>API</NavigationLink>
-                                </>
-                            )}
                         </div>
                         <Separator orientation='vertical' className='shrink-0 bg-border w-[1.1px] mx-4 h-9' />
                         <div className='flex items-center gap-4'>
                             <ThemeToggle />
                             {check ? (
-                                <NavigationDropdown user={user} />
+                                <NavigationDropdown />
                             ) : (
                                 <>
                                     <Link href='/login' className={cn(buttonVariants({ variant: 'outline' }))}>

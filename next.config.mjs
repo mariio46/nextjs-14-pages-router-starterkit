@@ -44,6 +44,11 @@ const nextConfig = {
                 source: '/dashboard/settings/danger',
                 permanent: true,
             },
+            {
+                destination: '/users',
+                source: '/dashboard/users',
+                permanent: true,
+            },
         ];
     },
     /**
@@ -81,6 +86,10 @@ const nextConfig = {
                 source: '/settings/danger',
                 destination: '/dashboard/settings/danger',
             },
+            {
+                source: '/users',
+                destination: '/dashboard/users',
+            },
         ];
     },
     images: {
@@ -89,11 +98,6 @@ const nextConfig = {
             {
                 hostname: 'localhost',
                 protocol: 'http',
-            },
-            {
-                hostname: 'tailwindui.com',
-                protocol: 'https',
-                pathname: '/img/**',
             },
         ],
     },

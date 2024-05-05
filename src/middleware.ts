@@ -28,15 +28,13 @@ export function middleware(request: NextRequest) {
  */
 export const config = {
     matcher: [
-        '/client-side', 
-        '/server-side', 
-        '/static-site-generation',
-        '/api-render',
-        '/dashboard',
+        // '/api/authorization/user-token-validation',
+        // '/dashboard',
         '/settings',
         '/settings/account',
         '/settings/security',
         '/settings/danger',
+        '/users',
         '/login',
         '/register',
     ],

@@ -10,8 +10,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
 import { NextPageWithLayout } from '@/pages/_app';
-import { AuthStateProvider } from '@/services/providers/auth-state-provider';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 const Account: NextPageWithLayout = () => {
@@ -53,11 +54,16 @@ const Account: NextPageWithLayout = () => {
 Account.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthStateProvider>
-                <AuthLayout title='Account'>{page}</AuthLayout>
-            </AuthStateProvider>
+            <AuthLayout title='Account'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
 export default Account;
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await getServerSideAuthUserData({ req, res });
+    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+
+    return { props: {} };
+}) satisfies GetServerSideProps;
