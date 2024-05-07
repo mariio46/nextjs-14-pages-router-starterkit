@@ -3,7 +3,8 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
+import { BE_LOGIN } from '@/lib/api/end-point';
+import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { cn } from '@/lib/utils';
@@ -43,6 +44,7 @@ export const LoginForm = () => {
     const isValidating = useAuthUserState((state) => state.isValidating);
 
     const router = useRouter();
+
     const form = useForm<LoginFormType>({
         resolver: zodResolver(loginFormSchema),
         defaultValues: { email: '', password: '' },
@@ -50,7 +52,7 @@ export const LoginForm = () => {
 
     const submit = async (values: LoginFormType) => {
         try {
-            const { data }: AxiosResponse<LoginFormResponse> = await axios.post('/login', values);
+            const { data }: AxiosResponse<LoginFormResponse> = await axios.post(BE_LOGIN, values);
             handleWhenLoginSuccess(data);
         } catch (e: any) {
             const error: { email?: string[]; password?: string[] } = e.response?.data?.errors;
@@ -77,6 +79,10 @@ export const LoginForm = () => {
             deleteCookie(TOKEN_COOKIE_KEY);
         }
 
+        if (hasCookie(TOKEN_DELETED_KEY)) {
+            deleteCookie(TOKEN_DELETED_KEY);
+        }
+
         // set cookie
         setCookie(TOKEN_COOKIE_KEY, data.data.access_token.token, {
             maxAge: 24 * 60 * 60,
@@ -92,7 +98,7 @@ export const LoginForm = () => {
         isValidating(false);
 
         // reload for trigger the middleware
-        router.push('/dashboard');
+        router.push(!router.query.callback ? '/dashboard' : `${router.query.callback?.toString()}`);
     };
 
     return (

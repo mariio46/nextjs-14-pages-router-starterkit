@@ -1,3 +1,4 @@
+import { BE_LOGOUT } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { getAxiosHeadersWithToken } from '@/lib/utils';
@@ -19,20 +20,18 @@ export const useAuth = () => {
         deleteCookie(TOKEN_COOKIE_KEY);
         setAuthCheck(false);
         isValidating(false);
+        router.push(`/login?callback=${router.asPath.toString()}`);
     };
 
     const logout = async () => {
         startLoading();
         try {
-            await axios.post('/logout', {}, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY));
+            await axios.post(BE_LOGOUT, {}, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY));
             clearCookieAndAuth();
-            if (router.pathname !== '/') router.push('/login');
         } catch (error: any) {
             if (error instanceof AxiosError && error.response?.status === 401) {
-                console.error(error);
                 clearCookieAndAuth();
             } else if (error instanceof AxiosError && error.response?.status !== 401) {
-                console.error(error);
                 clearCookieAndAuth();
             } else {
                 console.error(error);

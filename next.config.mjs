@@ -49,6 +49,11 @@ const nextConfig = {
                 source: '/dashboard/users',
                 permanent: true,
             },
+            {
+                destination: '/users/create',
+                source: '/dashboard/users/create',
+                permanent: true,
+            },
         ];
     },
     /**
@@ -89,6 +94,10 @@ const nextConfig = {
             {
                 source: '/users',
                 destination: '/dashboard/users',
+            },
+            {
+                source: '/users/create',
+                destination: '/dashboard/users/create',
             },
         ];
     },

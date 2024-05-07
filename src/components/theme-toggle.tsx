@@ -17,16 +17,15 @@ export function ThemeToggle() {
     const { theme, setTheme } = useTheme();
 
     useEffect(() => {
-        // setTimeout(() => startLoading(), 1000);
         startLoading();
-    }, [loading, startLoading]);
+    }, [loading]);
 
     if (!loading) return <Skeleton className='size-9 border border-input' />;
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant='outline' size='icon'>
+                <Button variant='ghost' size='icon'>
                     {theme === 'system' ? (
                         <Icon name='IconDeviceLaptop' />
                     ) : theme === 'dark' ? (
@@ -38,9 +37,18 @@ export function ThemeToggle() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className='z-[61]' align='end'>
-                <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('light')}>
+                    <Icon name='IconSunLow' className='me-2' />
+                    Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                    <Icon name='IconMoon' className='me-2' />
+                    Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('system')}>
+                    <Icon name='IconDeviceLaptop' className='me-2' />
+                    System
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -1,9 +1,19 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
-import { GetServerSideProps } from 'next';
-import { NextPageWithLayout } from '../_app';
+import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { type GetServerSideProps } from 'next';
+import { type NextPageWithLayout } from '../_app';
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_user = await cekAuthUserToken(req, res);
+
+    if (!token_user.authenticated) {
+        return RedirectIfUnauthencated;
+    }
+
+    return { props: {} };
+}) satisfies GetServerSideProps;
 
 const Dashboard: NextPageWithLayout = () => {
     return (
@@ -25,10 +35,3 @@ Dashboard.getLayout = function getLayout(page: React.ReactElement) {
 };
 
 export default Dashboard;
-
-export const getServerSideProps = (async ({ req, res }) => {
-    const token_status = await getServerSideAuthUserData({ req, res });
-    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
-
-    return { props: {} };
-}) satisfies GetServerSideProps;

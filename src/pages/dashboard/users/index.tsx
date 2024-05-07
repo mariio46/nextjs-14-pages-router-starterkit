@@ -3,18 +3,25 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { userColumns } from '@/components/pages/dashboard/users/column';
 import { DataTable } from '@/components/pages/dashboard/users/data-table';
-import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
+import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { getAllUsers } from '@/lib/api/data/users';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
-import axios from '@/lib/axios';
-import { getServerSideCookieToken } from '@/lib/utilities/axios-utils';
-import { NextPageWithLayout } from '@/pages/_app';
+import { type NextPageWithLayout } from '@/pages/_app';
 import { User } from '@/types/api/feature/users';
-import { AxiosError, AxiosResponse } from 'axios';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useQuery } from '@tanstack/react-query';
+import { getCookie } from 'cookies-next';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
 
-type TanStackUserTablePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+type UsersPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-const TanStackUserTable: NextPageWithLayout<TanStackUserTablePageProps> = ({ data }) => {
+const Users: NextPageWithLayout<UsersPageProps> = () => {
+    const { data, isLoading, isError, error, isFetching } = useQuery<User[]>({
+        queryKey: ['users'],
+        queryFn: () => getAllUsers(getCookie(TOKEN_COOKIE_KEY)),
+    });
+
+    if (isError) console.error(error);
+
     return (
         <>
             <HeaderPrimary>
@@ -24,14 +31,16 @@ const TanStackUserTable: NextPageWithLayout<TanStackUserTablePageProps> = ({ dat
                 </HeaderPrimaryDescription>
             </HeaderPrimary>
 
+            {isFetching && <div>Refetching...</div>}
+
             <section id='users-table' className='my-10'>
-                <DataTable data={data} columns={userColumns} />
+                <DataTable isLoading={isLoading} isError={isError} data={data!} columns={userColumns} />
             </section>
         </>
     );
 };
 
-TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
+Users.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <AuthLayout title='TanStack Users Table'>{page}</AuthLayout>
@@ -39,21 +48,16 @@ TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
     );
 };
 
-export default TanStackUserTable;
+export default Users;
 
 export const getServerSideProps = (async ({ req, res }) => {
-    const token_status = await getServerSideAuthUserData({ req, res });
-    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
+    const token_user = await cekAuthUserToken(req, res);
 
-    // prettier-ignore
-    const data = await axios
-        .get('/users', getServerSideCookieToken(TOKEN_COOKIE_KEY, { req, res }))
-        .then((res: AxiosResponse<User[]>) => res.data)
-        .catch((e: AxiosError) => {
-            throw new Error(`${e.response?.status} ${e.response?.statusText}`);
-        });
+    if (!token_user.authenticated) {
+        return RedirectIfUnauthencated;
+    }
 
     return {
-        props: { data },
+        props: {},
     };
-}) satisfies GetServerSideProps<{ data: User[] }>;
+}) satisfies GetServerSideProps;

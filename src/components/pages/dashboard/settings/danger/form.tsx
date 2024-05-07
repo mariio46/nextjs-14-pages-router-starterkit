@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { BE_DELETE_ACCOUNT } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
@@ -46,7 +47,7 @@ export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) 
     const submit = async (values: DeleteAccountFormFields) => {
         try {
             // prettier-ignore
-            const response: AxiosResponse<DeleteAccountResponse> = await axios.post('/delete-account', values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
+            const response: AxiosResponse<DeleteAccountResponse> = await axios.post(BE_DELETE_ACCOUNT, values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
 
             if (response.status === 200 && response.data.code === 200) {
                 handleWhenDeletingAccountIsSuccess(response.data);

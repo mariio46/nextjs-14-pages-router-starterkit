@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { BE_UPDATE_PASSWORD } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
@@ -63,7 +64,7 @@ export const UpdatePasswordForm = () => {
     const submit = async (values: UpdatePasswordFormFields): Promise<void> => {
         try {
             // prettier-ignore
-            const response: AxiosResponse<UpdatePasswordResponse> = await axios.post('/security', values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
+            const response: AxiosResponse<UpdatePasswordResponse> = await axios.post(BE_UPDATE_PASSWORD, values, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY))
 
             if (response.status === 200 && response.data.code === 200) {
                 handleWhenUpdatingPasswordIsSuccess(response.data);

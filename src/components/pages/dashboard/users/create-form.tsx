@@ -1,76 +1,69 @@
-import { Icon } from '@/components/icon';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { SubmitButton } from '@/components/submit-button';
+import { buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { BE_REGISTER } from '@/lib/api/end-point';
-import axios from '@/lib/axios';
+import { CreateUserErrorResponse, CreateUserFormFields, createUser, createUserFormSchema } from '@/lib/api/data/users';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { cn } from '@/lib/utils';
-import type { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type AxiosResponse } from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
-type RegisterFormResponse = ApiResponse & {
-    data: string;
-};
+export const CreateUserForm = () => {
+    const queryClient = useQueryClient();
 
-// prettier-ignore
-const registerFormSchema = z.object({
-    name: z.string().min(3),
-    email: z.string().email(),
-    password: z.string().min(8),
-    password_confirmation: z.string().min(8),
-}).refine((data) => data.password === data.password_confirmation, {
-    message: "Password doesn't match.",
-    path: ['password_confirmation'],
-});
-
-type RegisterFormFields = z.infer<typeof registerFormSchema>;
-
-export const RegisterForm = () => {
     const router = useRouter();
     const { toast } = useToast();
-    const form = useForm<RegisterFormFields>({
-        resolver: zodResolver(registerFormSchema),
+
+    // prettier-ignore
+    const form = useForm<CreateUserFormFields>({
+        resolver: zodResolver(createUserFormSchema),
         defaultValues: {
             name: '',
             email: '',
             password: '',
             password_confirmation: '',
-        },
+        }
     });
 
-    const onSubmit = async (values: RegisterFormFields) => {
-        try {
-            const { data }: AxiosResponse<RegisterFormResponse> = await axios.post(BE_REGISTER, values);
-
+    const mutation = useMutation({
+        mutationKey: ['create-user'],
+        mutationFn: createUser,
+        onSuccess: async (data) => {
+            form.reset();
+            router.push('/users');
             toast({
                 title: 'Success',
                 description: data.data,
-                duration: 2000,
             });
-
-            form.reset();
-
-            setTimeout(() => router.push('/login'), 2100);
-        } catch (e: any) {
-            const error = e.response?.data.errors;
+            queryClient.invalidateQueries({
+                queryKey: ['users'],
+                exact: true,
+            });
+        },
+        onError: async (e: AxiosError<CreateUserErrorResponse>) => {
+            const error = e.response?.data?.errors;
             // prettier-ignore
             handleAxiosError(e, toast, {
                 error_name: error?.name && form.setError('name', { message: error?.name[0] }),
                 error_email: error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
                 error_password: error?.password && form.setError('password', { message: error?.password[0] }),
             });
-        }
+        },
+    });
+
+    const submit = (values: CreateUserFormFields) => {
+        // prettier-ignore
+        mutation.mutateAsync(values).then(res => res).catch(e => e);
     };
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <form onSubmit={form.handleSubmit(submit)} className='space-y-4'>
                 <FormField
                     control={form.control}
                     name='name'
@@ -84,7 +77,6 @@ export const RegisterForm = () => {
                                     autoFocus
                                     type='text'
                                     aria-label='Name'
-                                    disabled={form.formState.isSubmitSuccessful}
                                     {...field}
                                 />
                             </FormControl>
@@ -104,7 +96,6 @@ export const RegisterForm = () => {
                                     autoComplete='email'
                                     type='email'
                                     aria-label='Email'
-                                    disabled={form.formState.isSubmitSuccessful}
                                     {...field}
                                 />
                             </FormControl>
@@ -124,7 +115,6 @@ export const RegisterForm = () => {
                                     type='password'
                                     autoComplete='password'
                                     aria-label='Password'
-                                    disabled={form.formState.isSubmitSuccessful}
                                     {...field}
                                 />
                             </FormControl>
@@ -143,7 +133,6 @@ export const RegisterForm = () => {
                                     placeholder='********'
                                     type='password'
                                     autoComplete='confirm-password'
-                                    disabled={form.formState.isSubmitSuccessful}
                                     aria-label='Confirm Password'
                                     {...field}
                                 />
@@ -152,17 +141,11 @@ export const RegisterForm = () => {
                         </FormItem>
                     )}
                 />
-                <div className='flex justify-end gap-4'>
-                    <Link href='/login' className={cn(buttonVariants({ variant: 'ghost' }))}>
-                        Already have an account
+                <div className='flex justify-start gap-4'>
+                    <Link href='/users' className={cn(buttonVariants({ variant: 'outline' }))}>
+                        Back
                     </Link>
-                    <Button
-                        type='submit'
-                        disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
-                        aria-label='Register'>
-                        {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
-                        {!form.formState.isSubmitting ? 'Register' : 'Registering...'}
-                    </Button>
+                    <SubmitButton disabledWhen={mutation.isPending} defaultLabel='Submit' onLoadingLabel='Submitting' />
                 </div>
             </form>
         </Form>

@@ -14,10 +14,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToggleDialog } from '@/hooks/use-toggle-dialog';
-import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
-import { NextPageWithLayout } from '@/pages/_app';
-import { GetServerSideProps } from 'next';
+import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps } from 'next';
 import Link from 'next/link';
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_user = await cekAuthUserToken(req, res);
+
+    if (!token_user.authenticated) {
+        return RedirectIfUnauthencated;
+    }
+
+    return { props: {} };
+}) satisfies GetServerSideProps;
 
 const DangerArea: NextPageWithLayout = () => {
     const { openDialog, toggleDialog } = useToggleDialog();
@@ -89,10 +99,3 @@ DangerArea.getLayout = function getLayout(page: React.ReactElement) {
 };
 
 export default DangerArea;
-
-export const getServerSideProps = (async ({ req, res }) => {
-    const token_status = await getServerSideAuthUserData({ req, res });
-    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
-
-    return { props: {} };
-}) satisfies GetServerSideProps;

@@ -10,10 +10,20 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
+import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type NextPageWithLayout } from '@/pages/_app';
-import { GetServerSideProps } from 'next';
+import { type GetServerSideProps } from 'next';
 import Link from 'next/link';
+
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_user = await cekAuthUserToken(req, res);
+
+    if (!token_user.authenticated) {
+        return RedirectIfUnauthencated;
+    }
+
+    return { props: {} };
+}) satisfies GetServerSideProps;
 
 const Security: NextPageWithLayout = () => {
     return (
@@ -60,10 +70,3 @@ Security.getLayout = function getLayout(page: React.ReactElement) {
 };
 
 export default Security;
-
-export const getServerSideProps = (async ({ req, res }) => {
-    const token_status = await getServerSideAuthUserData({ req, res });
-    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
-
-    return { props: {} };
-}) satisfies GetServerSideProps;
