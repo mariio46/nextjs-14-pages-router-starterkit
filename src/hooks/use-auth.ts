@@ -1,7 +1,7 @@
 import { BE_LOGOUT } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
 import axios from '@/lib/axios';
-import { getAxiosHeadersWithToken } from '@/lib/utils';
+import { getAxiosHeadersWithToken } from '@/lib/utilities/axios-utils';
 import { useAuthUserState } from '@/services/store/auth-user-state';
 import { AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';

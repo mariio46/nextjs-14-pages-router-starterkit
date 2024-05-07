@@ -24,4 +24,3 @@ export const FRONTEND_API_URL = `${ENV.FRONTEND_BASE_URL}/api`;
 /**
  * Frontend Api sub-route | starts with : `FE`
  */
-export const FE_CHECK_TOKEN = '/auth/token-validation';

@@ -1,14 +1,14 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type GetServerSideProps } from 'next';
 import { type NextPageWithLayout } from '../_app';
 
 export const getServerSideProps = (async ({ req, res }) => {
-    const token_user = await cekAuthUserToken(req, res);
+    const token_status = await authUserTokenValidation(req, res);
 
-    if (!token_user.authenticated) {
+    if (!token_status.authenticated) {
         return RedirectIfUnauthencated;
     }
 

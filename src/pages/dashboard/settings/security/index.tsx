@@ -10,15 +10,15 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { RedirectIfUnauthencated, cekAuthUserToken } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type NextPageWithLayout } from '@/pages/_app';
 import { type GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 export const getServerSideProps = (async ({ req, res }) => {
-    const token_user = await cekAuthUserToken(req, res);
+    const token_status = await authUserTokenValidation(req, res);
 
-    if (!token_user.authenticated) {
+    if (!token_status.authenticated) {
         return RedirectIfUnauthencated;
     }
 

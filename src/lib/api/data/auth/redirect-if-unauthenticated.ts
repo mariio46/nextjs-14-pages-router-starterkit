@@ -1,4 +1,4 @@
-import { FE_CHECK_TOKEN, FRONTEND_API_URL } from '@/lib/api/end-point';
+import { BE_CHECK_TOKEN } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY, TOKEN_DELETED_VALUE } from '@/lib/api/key';
 import axios from '@/lib/axios';
 import type { ApiResponse } from '@/types/api-response';
@@ -12,18 +12,14 @@ type ResponseProps = ServerResponse;
 type AuthUserTokenResponse = ApiResponse & { data: string };
 type AuthUserTokenReturn = { authenticated: boolean };
 
-export const cekAuthUserToken = async (req: RequestProps, res: ResponseProps): Promise<AuthUserTokenReturn> => {
+export const authUserTokenValidation = async (req: RequestProps, res: ResponseProps): Promise<AuthUserTokenReturn> => {
     const token_status: AuthUserTokenResponse = await axios
-        .get(FE_CHECK_TOKEN, {
-            baseURL: FRONTEND_API_URL,
-            headers: { Authorization: `Bearer ${req.cookies.authApiToken}` },
-        })
-        .then((r) => r.data)
-        .catch((e) => e.response.data);
+        .get(BE_CHECK_TOKEN, { headers: { Authorization: `Bearer ${req.cookies.authApiToken}` } })
+        .then((res) => res.data)
+        .catch((error) => error.response.data);
 
     if (token_status.code === 401 || token_status.code !== 200) {
         if (hasCookie(TOKEN_COOKIE_KEY, { req, res })) {
-            console.log('Delete Token Triggered');
             deleteCookie(TOKEN_COOKIE_KEY, { req, res });
             setCookie(TOKEN_DELETED_KEY, TOKEN_DELETED_VALUE, { req, res, maxAge: 24 * 60 * 60 });
         }
