@@ -1,6 +1,7 @@
 import { BE_CHECK_TOKEN } from '@/lib/api/end-point';
 import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY, TOKEN_DELETED_VALUE } from '@/lib/api/key';
 import axios from '@/lib/axios';
+import { getServerSideAxiosHeaders } from '@/lib/cookies-next';
 import type { ApiResponse } from '@/types/api-response';
 import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
 import { type IncomingMessage, type ServerResponse } from 'http';
@@ -14,7 +15,7 @@ type AuthUserTokenReturn = { authenticated: boolean };
 
 export const authUserTokenValidation = async (req: RequestProps, res: ResponseProps): Promise<AuthUserTokenReturn> => {
     const token_status: AuthUserTokenResponse = await axios
-        .get(BE_CHECK_TOKEN, { headers: { Authorization: `Bearer ${req.cookies.authApiToken}` } })
+        .get(BE_CHECK_TOKEN, getServerSideAxiosHeaders(req, res))
         .then((res) => res.data)
         .catch((error) => error.response.data);
 

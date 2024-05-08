@@ -1,5 +1,5 @@
 import { Loading } from '@/components/loading';
-import { useAuthUserData } from '@/hooks/use-auth-user-data';
+import { useFetchAuthUserData } from '@/lib/api/data/auth/fetch-auth-user-data';
 import '@/styles/globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -28,7 +28,7 @@ const queryClient = new QueryClient({
 });
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-    const { validating } = useAuthUserData();
+    const { validating } = useFetchAuthUserData();
 
     if (!validating) return <Loading />;
 

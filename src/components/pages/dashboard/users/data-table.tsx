@@ -40,11 +40,7 @@ export function DataTable<TData, TValue>({ columns, data, isLoading, isError }: 
 
     return (
         <div>
-            <div className='flex items-center justify-between py-4'>
-                <Link href='/users/create' className={buttonVariants({ variant: 'default' })}>
-                    <Icon name='IconCirclePlus' className='me-1' />
-                    Add User
-                </Link>
+            <div className='flex items-center justify-end gap-2 py-4'>
                 <Input
                     placeholder='Find user by their name.'
                     autoFocus
@@ -52,6 +48,10 @@ export function DataTable<TData, TValue>({ columns, data, isLoading, isError }: 
                     onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                     className='max-w-sm'
                 />
+                <Link href='/users/create' className={buttonVariants({ variant: 'default' })}>
+                    <Icon name='IconCirclePlus' className='me-1' />
+                    Add New User
+                </Link>
             </div>
             <div className='rounded-md'>
                 <Table>

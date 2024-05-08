@@ -1,14 +1,14 @@
-import { BE_LOGOUT } from '@/lib/api/end-point';
-import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
+import { useLoading } from '@/hooks/use-loading';
 import axios from '@/lib/axios';
-import { getAxiosHeadersWithToken } from '@/lib/utilities/axios-utils';
+import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
 import { AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
-import { useLoading } from './use-loading';
+import { BE_LOGOUT } from '../../end-point';
+import { TOKEN_COOKIE_KEY } from '../../key';
 
-export const useAuth = () => {
+export const useLogout = () => {
     const { loading, startLoading, stopLoading } = useLoading();
 
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
@@ -26,7 +26,7 @@ export const useAuth = () => {
     const logout = async () => {
         startLoading();
         try {
-            await axios.post(BE_LOGOUT, {}, getAxiosHeadersWithToken(TOKEN_COOKIE_KEY));
+            await axios.post(BE_LOGOUT, {}, getClientSideAxiosHeaders());
             clearCookieAndAuth();
         } catch (error: any) {
             if (error instanceof AxiosError && error.response?.status === 401) {

@@ -1,3 +1,4 @@
+import { DropdownAlertDialog } from '@/components/dropdown-alert-dialog';
 import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/components/ui/use-toast';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
+import { useToggleDialog } from '@/hooks/use-toggle-dialog';
+import { useDeleteUser } from '@/lib/api/data/users/delete-user';
 import { acronym } from '@/lib/utils';
 import { User } from '@/types/api/feature/users';
 import { ColumnDef } from '@tanstack/react-table';
@@ -60,22 +63,15 @@ const TableUserAvatar: React.FC<{ user: User }> = ({ user }) => {
 };
 
 const TableUserDropdownAction: React.FC<{ user: User }> = ({ user }) => {
-    const { toast } = useToast();
-
-    const copyUsernameToClipboard = (username: string) => {
-        navigator.clipboard.writeText(username);
-        toast({
-            title: 'Success',
-            description: `User with username ${username} copied to clipboard.`,
-            duration: 2500,
-        });
-    };
+    const { copyUsernameToClipboard } = useCopyToClipboard();
+    const { openAlertDialog, toggleAlertDialog } = useToggleDialog();
+    const { handleDeleteUser, isPending } = useDeleteUser();
 
     return (
         <div className='text-end'>
-            <DropdownMenu>
+            <DropdownMenu key={user.id}>
                 <DropdownMenuTrigger asChild>
-                    <Button variant='outline' className='h-5' size='icon'>
+                    <Button variant='outline' disabled={isPending} className='h-5' size='icon'>
                         <span className='sr-only'>Open menu</span>
                         <Icon name='IconDots' className='size-4' />
                     </Button>
@@ -92,10 +88,18 @@ const TableUserDropdownAction: React.FC<{ user: User }> = ({ user }) => {
                         <Icon name='IconBan' className='me-1.5 stroke-[1.3]' />
                         Ban User
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Icon name='IconTrash' className='me-1.5 stroke-[1.3]' />
-                        Delete
-                    </DropdownMenuItem>
+                    <DropdownAlertDialog
+                        AlertDialogKey={user.id}
+                        trigger_text='Delete'
+                        trigger_icon='IconTrash'
+                        open={openAlertDialog}
+                        onOpenChange={toggleAlertDialog}
+                        action={() => handleDeleteUser(user.username)}
+                        action_text='Delete'
+                        description='This action cannot be undone. This will permanently delete this user and remove data from our
+                        servers'
+                        disabledWhen={isPending}
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

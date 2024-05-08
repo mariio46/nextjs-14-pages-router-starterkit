@@ -1,6 +1,6 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
+import { AuthShellPrimary } from '@/components/layouts/shells/auth-shell-primary';
 import { SettingsCards } from '@/components/pages/dashboard/settings/settings-card';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type NextPageWithLayout } from '@/pages/_app';
@@ -18,18 +18,13 @@ export const getServerSideProps = (async ({ req, res }) => {
 
 const Settings: NextPageWithLayout = () => {
     return (
-        <>
-            <HeaderPrimary>
-                <HeaderPrimaryTitle>Settings</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>
-                    Manage your account by using the correct account and updating your password regularly.
-                </HeaderPrimaryDescription>
-            </HeaderPrimary>
-
+        <AuthShellPrimary
+            title='Settings'
+            description='Manage your account by using the correct account and updating your password regularly.'>
             <section id='settings-card' className='mt-5'>
                 <SettingsCards />
             </section>
-        </>
+        </AuthShellPrimary>
     );
 };
 
