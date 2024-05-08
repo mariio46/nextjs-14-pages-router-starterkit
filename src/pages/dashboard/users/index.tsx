@@ -1,37 +1,44 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
+import { AuthShellPrimary } from '@/components/layouts/shells/auth-shell-primary';
 import { userColumns } from '@/components/pages/dashboard/users/column';
 import { DataTable } from '@/components/pages/dashboard/users/data-table';
-import { getServerSideAuthUserData } from '@/lib/api/data/auth/user';
-import { TOKEN_COOKIE_KEY } from '@/lib/api/key';
-import axios from '@/lib/axios';
-import { getServerSideCookieToken } from '@/lib/utilities/axios-utils';
-import { NextPageWithLayout } from '@/pages/_app';
-import { User } from '@/types/api/feature/users';
-import { AxiosError, AxiosResponse } from 'axios';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { useFetchAllUsers } from '@/lib/api/data/users/fetch-users';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
 
-type TanStackUserTablePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+type UsersPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-const TanStackUserTable: NextPageWithLayout<TanStackUserTablePageProps> = ({ data }) => {
+export const getServerSideProps = (async ({ req, res }) => {
+    const token_status = await authUserTokenValidation(req, res);
+
+    if (!token_status.authenticated) {
+        return RedirectIfUnauthencated;
+    }
+
+    return {
+        props: {},
+    };
+}) satisfies GetServerSideProps;
+
+const Users: NextPageWithLayout<UsersPageProps> = () => {
+    const { data, isLoading, isError, error } = useFetchAllUsers();
+
+    if (isError) console.error(error);
+
     return (
-        <>
-            <HeaderPrimary>
-                <HeaderPrimaryTitle>TanStack Users Table</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>
-                    list of all users, you can create, update, and delete user you choose.
-                </HeaderPrimaryDescription>
-            </HeaderPrimary>
-
+        <AuthShellPrimary
+            title='Users'
+            description='list of all users, you can create, update, and delete user you choose.'>
             <section id='users-table' className='my-10'>
-                <DataTable data={data} columns={userColumns} />
+                <DataTable isLoading={isLoading} isError={isError} data={data!} columns={userColumns} />
             </section>
-        </>
+        </AuthShellPrimary>
     );
 };
 
-TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
+Users.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <AuthLayout title='TanStack Users Table'>{page}</AuthLayout>
@@ -39,21 +46,4 @@ TanStackUserTable.getLayout = function getLayout(page: React.ReactElement) {
     );
 };
 
-export default TanStackUserTable;
-
-export const getServerSideProps = (async ({ req, res }) => {
-    const token_status = await getServerSideAuthUserData({ req, res });
-    if (token_status.isUnauthenticated) return { redirect: token_status?.redirect! };
-
-    // prettier-ignore
-    const data = await axios
-        .get('/users', getServerSideCookieToken(TOKEN_COOKIE_KEY, { req, res }))
-        .then((res: AxiosResponse<User[]>) => res.data)
-        .catch((e: AxiosError) => {
-            throw new Error(`${e.response?.status} ${e.response?.statusText}`);
-        });
-
-    return {
-        props: { data },
-    };
-}) satisfies GetServerSideProps<{ data: User[] }>;
+export default Users;

@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/hooks/use-auth';
+import { useLogout } from '@/lib/api/data/auth/logout';
 import { acronym } from '@/lib/utils';
 import { useAuthUserState } from '@/services/store/auth-user-state';
 import Link from 'next/link';
@@ -15,7 +15,7 @@ import { Icon } from './icon';
 
 export const NavigationDropdown = () => {
     const user = useAuthUserState((state) => state.user);
-    const { logout, loading } = useAuth();
+    const { logout, loading } = useLogout();
 
     return (
         <DropdownMenu>

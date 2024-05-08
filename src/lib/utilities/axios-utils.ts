@@ -44,19 +44,27 @@ export const handleAxiosError = (e: any, toast: ToasterProps, { ...props }: hand
     }
 };
 
-export const getServerSideCookieToken = (
-    token: string,
-    options?: {
-        req: IncomingMessage & {
-            cookies: NextApiRequestCookies;
-        };
-        res: ServerResponse;
-    },
-): {} | undefined => {
-    if (hasCookie(token, { req: options?.req, res: options?.res })) {
+type TokenType = string;
+type RequestProps = IncomingMessage & { cookies: NextApiRequestCookies };
+type ResponseProps = ServerResponse;
+
+export const getAxiosHeadersWithToken = (token: TokenType): {} | undefined => {
+    if (hasCookie(token)) {
         return {
             headers: {
-                Authorization: `Bearer ${getCookie(token, { req: options?.req, res: options?.res })}`,
+                Authorization: `Bearer ${getCookie(token)}`,
+            },
+        };
+    }
+
+    return undefined;
+};
+
+export const getServerSideCookieToken = (token: TokenType, req: RequestProps, res: ResponseProps): {} | undefined => {
+    if (hasCookie(token, { req, res })) {
+        return {
+            headers: {
+                Authorization: `Bearer ${getCookie(token, { req, res })}`,
             },
         };
     }

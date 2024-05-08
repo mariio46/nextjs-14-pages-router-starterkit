@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { type ReactElement } from 'react';
 import { Navigation } from '../navigation';
 
@@ -13,7 +14,9 @@ export const AppLayout = ({ children, title }: { children: ReactElement; title: 
                 <div className='mt-20' />
                 <div className='border-b'>
                     <div className='h-60 flex items-center mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-                        <h3 className='text-xl font-semibold'>{title} / Page</h3>
+                        <Link href='/users'>
+                            <h3 className='text-xl font-semibold'>{title} / Page</h3>
+                        </Link>
                     </div>
                 </div>
                 <main className='p-10'>{children}</main>

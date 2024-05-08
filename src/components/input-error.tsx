@@ -5,7 +5,7 @@ interface InputErrorType extends React.HTMLAttributes<HTMLParagraphElement> {
     message?: string;
 }
 
-export const InputError = ({ message, className, ...props }: InputErrorType) => {
+export const InputError: React.FC<InputErrorType> = ({ message, className, ...props }) => {
     return message ? (
         <p className={cn('text-sm text-red-600', className)} {...props}>
             {message}

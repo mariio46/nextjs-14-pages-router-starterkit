@@ -1,7 +1,7 @@
 import { Counter } from '@/components/counter';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { NextPageWithLayout } from '../_app';
+import { type NextPageWithLayout } from '../_app';
 
 const Home: NextPageWithLayout = () => {
     return (
