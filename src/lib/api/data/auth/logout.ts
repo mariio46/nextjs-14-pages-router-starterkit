@@ -5,6 +5,7 @@ import { useAuthUserState } from '@/services/store/auth-user-state';
 import { AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
 import { BE_LOGOUT } from '../../end-point';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
@@ -12,14 +13,14 @@ export const useLogout = () => {
     const { loading, startLoading, stopLoading } = useLoading();
 
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
-    const isValidating = useAuthUserState((state) => state.isValidating);
 
     const router = useRouter();
+    const { mutate } = useSWRConfig();
 
     const clearCookieAndAuth = (): void => {
         deleteCookie(TOKEN_COOKIE_KEY);
         setAuthCheck(false);
-        isValidating(false);
+        mutate('/user', undefined);
         router.push(`/login?callback=${router.asPath.toString()}`);
     };
 

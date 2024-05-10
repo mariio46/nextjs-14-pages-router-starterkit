@@ -4,6 +4,7 @@ import useCount from '@/services/store/use-count';
 
 export const Counter = () => {
     const { count, inc, dec, reset } = useCount();
+
     return (
         <Card className='max-w-lg'>
             <CardHeader>

@@ -3,17 +3,15 @@ import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api-response';
+import { ApiResponse } from '@/types/api/response';
 import { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse } from 'axios';
 import { useForm } from 'react-hook-form';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { BE_UPDATE_ACCOUNT } from '../../end-point';
 
-interface UpdateAccountResponse extends ApiResponse {
-    data: User;
-}
+type UpdateAccountResponse = ApiResponse<User>;
 
 // prettier-ignore
 const updateAccountFormSchema = z.object({
@@ -40,7 +38,8 @@ export const useUpdateAccount = () => {
             email: state.user?.email,
         };
     });
-    const setValidating = useAuthUserState((state) => state.isValidating);
+
+    const { mutate } = useSWRConfig();
 
     const { toast } = useToast();
 
@@ -56,13 +55,9 @@ export const useUpdateAccount = () => {
     const submit = async (values: UpdateAccountFormFields): Promise<void> => {
         try {
             // prettier-ignore
-            const response: AxiosResponse<UpdateAccountResponse> = await axios.post(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders());
+            const response = await axios.post<UpdateAccountResponse>(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders());
 
-            if (response.status === 200 && response.data.code === 200) {
-                handleWhenUpdatingAccountIsSuccess(response.data);
-            } else {
-                console.log(response);
-            }
+            handleWhenUpdatingAccountIsSuccess(response.data);
         } catch (e: any) {
             const error: { name?: string[]; username?: string[]; email?: string[] } = e.response?.data.errors;
             // prettier-ignore
@@ -76,7 +71,7 @@ export const useUpdateAccount = () => {
 
     const handleWhenUpdatingAccountIsSuccess = (data: UpdateAccountResponse): void => {
         // Revalidate Auth User State
-        setValidating(false);
+        mutate('/user', data.data);
 
         // Toast for showing that updating account is success
         toast({

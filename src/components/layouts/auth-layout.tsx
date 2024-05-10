@@ -3,12 +3,14 @@ import { type ReactElement } from 'react';
 import { Navigation } from '../navigation';
 import { SideNavigation } from '../side-navigation';
 
-export const AuthLayout = ({ children, title }: { children: ReactElement; title: string }) => {
+export const AuthLayout = ({ children, title }: { children: ReactElement; title?: string }) => {
     return (
         <>
-            <Head>
-                <title>{`${title} / NextJS-14`}</title>
-            </Head>
+            {title && (
+                <Head>
+                    <title>{`${title} / NextJS-14`}</title>
+                </Head>
+            )}
             <div>
                 <Navigation />
                 <div className='mt-20' />

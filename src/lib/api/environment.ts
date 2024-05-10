@@ -5,4 +5,6 @@ export class ENV {
     static API_TOKEN_KEY: string = 'authApiToken';
     static DELETED_TOKEN_CONFIRMATION_KEY: string = 'AUTH_API_TOKEN_DELETED';
     static DELETED_TOKEN_CONFIRMATION_VALUE: string = 'h4XffYbdAMXZ5rgsLLsTNEJ4IlZ/asWc1R9BGLhWcKI=';
+
+    static SUPER_ADMIN_PERMISSION_SPECIAL_NAME: string = '*';
 }

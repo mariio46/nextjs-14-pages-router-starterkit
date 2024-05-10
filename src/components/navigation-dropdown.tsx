@@ -25,7 +25,7 @@ export const NavigationDropdown = () => {
                     <AvatarFallback>{acronym(user?.name!)}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-full min-w-[8rem] z-[61]'>
+            <DropdownMenuContent align='end' className='w-full min-w-[15rem] mt-2 z-[61]'>
                 <DropdownMenuLabel>
                     <div className='relative flex items-center font-normal'>
                         <Avatar className='size-8'>

@@ -2,24 +2,22 @@ import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
 import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api-response';
+import { ApiResponse } from '@/types/api/response';
 import { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse } from 'axios';
 import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { BE_LOGIN } from '../../end-point';
 import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY } from '../../key';
 
-interface LoginFormResponse extends ApiResponse {
-    data: {
-        user: User;
-        access_token: {
-            token: string;
-            expires_at: string;
-        };
+interface LoginFormResponse {
+    user: User;
+    access_token: {
+        token: string;
+        expires_at: string;
     };
 }
 
@@ -35,9 +33,9 @@ export const useLogin = () => {
 
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
     const setAuthUser = useAuthUserState((state) => state.setUser);
-    const isValidating = useAuthUserState((state) => state.isValidating);
 
     const router = useRouter();
+    const { mutate } = useSWRConfig();
 
     const form = useForm<LoginFormType>({
         resolver: zodResolver(loginFormSchema),
@@ -46,7 +44,7 @@ export const useLogin = () => {
 
     const submit = async (values: LoginFormType) => {
         try {
-            const { data }: AxiosResponse<LoginFormResponse> = await axios.post(BE_LOGIN, values);
+            const { data } = await axios.post<ApiResponse<LoginFormResponse>>(BE_LOGIN, values);
             handleWhenLoginSuccess(data);
         } catch (e: any) {
             const error: { email?: string[]; password?: string[] } = e.response?.data?.errors;
@@ -58,7 +56,7 @@ export const useLogin = () => {
         }
     };
 
-    const handleWhenLoginSuccess = (data: LoginFormResponse) => {
+    const handleWhenLoginSuccess = (data: ApiResponse<LoginFormResponse>) => {
         toast({
             title: 'Success',
             description: data.message,
@@ -89,7 +87,8 @@ export const useLogin = () => {
 
         // trigger useEffect in _app.tsx to update auth user state once again
         setAuthCheck(true);
-        isValidating(false);
+
+        mutate('/user', data.data.user);
 
         // reload for trigger the middleware
         router.push(!router.query.callback ? '/dashboard' : `${router.query.callback?.toString()}`);

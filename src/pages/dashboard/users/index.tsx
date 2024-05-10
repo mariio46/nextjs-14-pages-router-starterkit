@@ -3,6 +3,7 @@ import { RootLayout } from '@/components/layouts/root-layout';
 import { AuthShellPrimary } from '@/components/layouts/shells/auth-shell-primary';
 import { userColumns } from '@/components/pages/dashboard/users/column';
 import { DataTable } from '@/components/pages/dashboard/users/data-table';
+import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchAllUsers } from '@/lib/api/data/users/fetch-users';
 import { type NextPageWithLayout } from '@/pages/_app';
@@ -12,10 +13,10 @@ type UsersPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
+    const permission_status = await useCheckPermission('management users', { req, res });
 
-    if (!token_status.authenticated) {
-        return RedirectIfUnauthencated;
-    }
+    if (!token_status.authenticated) return RedirectIfUnauthencated;
+    if (!permission_status.authorized) return RedirectIfUnauthorized;
 
     return {
         props: {},

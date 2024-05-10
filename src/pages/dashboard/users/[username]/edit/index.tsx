@@ -1,7 +1,7 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { CreateUserForm } from '@/components/pages/dashboard/users/create-form';
+import { EditUserForm } from '@/components/pages/dashboard/users/edit-form';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -12,11 +12,14 @@ import {
 } from '@/components/ui/breadcrumb';
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { useFetchSingleUser } from '@/lib/api/data/users/fetch-users';
+import { initialWord } from '@/lib/utils';
 import { NextPageWithLayout } from '@/pages/_app';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-type UserCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+type UserEditPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
@@ -31,10 +34,19 @@ export const getServerSideProps = (async ({ req, res }) => {
         return RedirectIfUnauthorized;
     }
 
-    return { props: {} };
+    return {
+        props: {},
+    };
 }) satisfies GetServerSideProps;
 
-const UserCreatePage: NextPageWithLayout<UserCreatePageProps> = () => {
+const UserEditPage: NextPageWithLayout<UserEditPageProps> = () => {
+    const { query } = useRouter();
+    const username = query.username as string;
+
+    const { data, isLoading, isError } = useFetchSingleUser(username as string);
+
+    const title: string = data?.data.user ? `Detail ${initialWord(data?.data.user.name)}` : 'Detail User';
+
     return (
         <>
             <Breadcrumb>
@@ -46,31 +58,39 @@ const UserCreatePage: NextPageWithLayout<UserCreatePageProps> = () => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Create User</BreadcrumbPage>
+                        <BreadcrumbLink asChild>
+                            <Link href={`/users/${query.username}`}>{title}</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Edit User</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
             <HeaderPrimary className='my-5 space-y-0.5'>
-                <HeaderPrimaryTitle className='text-base'>Create User</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>Fill all the field below to add one user.</HeaderPrimaryDescription>
+                <HeaderPrimaryTitle className='text-base'>Edit User</HeaderPrimaryTitle>
+                <HeaderPrimaryDescription>Detail user that contain their information.</HeaderPrimaryDescription>
             </HeaderPrimary>
 
-            <section id='create-user-form'>
-                <div className='max-w-xl'>
-                    <CreateUserForm />
-                </div>
+            <section id='edit-user-form'>
+                {!isLoading && !isError && (
+                    <div className='max-w-xl'>
+                        <EditUserForm user={data?.data.user!} />
+                    </div>
+                )}
             </section>
         </>
     );
 };
 
-UserCreatePage.getLayout = function getLayout(page: React.ReactElement) {
+UserEditPage.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthLayout title='Create User'>{page}</AuthLayout>
+            <AuthLayout title='Edit User'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
-export default UserCreatePage;
+export default UserEditPage;

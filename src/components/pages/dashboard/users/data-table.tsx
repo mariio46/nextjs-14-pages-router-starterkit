@@ -11,10 +11,10 @@ import {
 } from '@tanstack/react-table';
 
 import { Icon } from '@/components/icon';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Link } from '@/components/link';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({ columns, data, isLoading, isError }: 
                     onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                     className='max-w-sm'
                 />
-                <Link href='/users/create' className={buttonVariants({ variant: 'default' })}>
+                <Link href='/users/create'>
                     <Icon name='IconCirclePlus' className='me-1' />
                     Add New User
                 </Link>

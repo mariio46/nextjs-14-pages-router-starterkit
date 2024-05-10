@@ -3,7 +3,7 @@ import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { FETCH_ALL_USERS_KEY } from '@/lib/query-key';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { ApiResponse } from '@/types/api-response';
+import { ApiResponse } from '@/types/api/response';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -11,9 +11,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-interface CreateUserFormResponse extends ApiResponse {
-    data: string;
-}
+type CreateUserFormResponse = ApiResponse<string>;
 
 interface CreateUserErrorResponse {
     errors?: {
@@ -65,7 +63,7 @@ export const useCreateUser = () => {
         onSuccess: (data) => handleWhenCreateUserIsSuccess(data.data),
         onError: (e: AxiosError<CreateUserErrorResponse>) => {
             const error = e.response?.data?.errors;
-            // // prettier-ignore
+            // prettier-ignore
             handleAxiosError(e, toast, {
                 error_name: error?.name && form.setError('name', { message: error?.name[0] }),
                 error_email:

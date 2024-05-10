@@ -1,17 +1,14 @@
 import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { ApiResponse } from '@/types/api-response';
+import { ApiResponse } from '@/types/api/response';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { BE_REGISTER } from '../../end-point';
 
-type RegisterFormResponse = ApiResponse & {
-    data: string;
-};
+type RegisterFormResponse = ApiResponse<string>;
 
 // prettier-ignore
 const registerFormSchema = z.object({
@@ -42,7 +39,7 @@ export const useRegister = () => {
 
     const submit = async (values: RegisterFormFields) => {
         try {
-            const { data }: AxiosResponse<RegisterFormResponse> = await axios.post(BE_REGISTER, values);
+            const { data } = await axios.post<RegisterFormResponse>(BE_REGISTER, values);
 
             toast({
                 title: 'Success',
