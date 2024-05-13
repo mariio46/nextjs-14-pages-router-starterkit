@@ -3,3 +3,7 @@ export interface ApiResponse<TData> {
     message: string;
     data: TData;
 }
+
+export interface ApiValidationErrorResponse<TError> {
+    errors?: TError;
+}

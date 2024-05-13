@@ -1,3 +1,4 @@
+import { Error } from '@/components/error';
 import { Loading } from '@/components/loading';
 import { useAuth } from '@/lib/api/data/auth/use-auth';
 import '@/styles/globals.css';
@@ -23,14 +24,16 @@ const queryClient = new QueryClient({
         queries: {
             // 5 minute * 60 seconds * 1000 milliseconds = 5 minutes
             staleTime: 5 * 60 * 1000,
+            gcTime: 5 * 60 * 1000,
         },
     },
 });
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-    const { isValidating, isLoading } = useAuth();
+    const { isLoading, isServerDown, serverDownStatus, serverDownMessage } = useAuth();
 
-    if (isLoading || isValidating) return <Loading />;
+    if (isLoading) return <Loading />;
+    if (isServerDown) return <Error code={serverDownStatus!} message={serverDownMessage!} />;
 
     const getLayout = Component.getLayout || ((page) => page);
 

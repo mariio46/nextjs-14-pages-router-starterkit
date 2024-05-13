@@ -42,7 +42,7 @@ const Users: NextPageWithLayout<UsersPageProps> = () => {
 Users.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthLayout title='TanStack Users Table'>{page}</AuthLayout>
+            <AuthLayout title='Users'>{page}</AuthLayout>
         </RootLayout>
     );
 };

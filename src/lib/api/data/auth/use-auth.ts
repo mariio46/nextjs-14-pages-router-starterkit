@@ -15,22 +15,39 @@ export const useAuth = () => {
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
 
     // prettier-ignore
-    const { isLoading, isValidating } = useSWR<ApiResponse<AuthUserType>, AxiosError<{ message: string }>>('/user', authFetcher, {
-            errorRetryCount: 1,
-            shouldRetryOnError: false,
+    const { isLoading, isValidating, error: errorResult } = useSWR<ApiResponse<AuthUserType>, AxiosError<{ message: string }>>('/user', authFetcher, {
+            shouldRetryOnError: true,
             revalidateOnFocus: false,
-            refreshInterval: 5 * 60 * 1000, // 5 minute * 60 seconds * 1000 milliseconds = 5 minutes
+            errorRetryInterval: 5000,
+            refreshInterval: 1.5 * 60 * 1000, // 1.5 minute * 60 seconds * 1.5000 milliseconds = 1.5 minutes
             onSuccess: (data) => {
                 setAuthUser(data.data.user);
                 setAuthCheck(true);
             },
-            onError: () => {
-                setAuthUser(undefined);
-                setAuthCheck(false);
-                if (hasCookie(TOKEN_COOKIE_KEY)) deleteCookie(TOKEN_COOKIE_KEY);
+            onError: (error) => {
+                if (error.response?.status === 401) {
+                    setAuthUser(undefined);
+                    setAuthCheck(false);
+                    if (hasCookie(TOKEN_COOKIE_KEY)) deleteCookie(TOKEN_COOKIE_KEY);
+                }
+            },
+            onErrorRetry: (error, key, config, revalidate, revalidateOpts) => {
+                if (error.response?.status === 401) return
+                
+                if (error.response?.status === 503) return
+
+                if (revalidateOpts.retryCount >= 5) return
+
+                setTimeout(() => revalidate({ retryCount: revalidateOpts.retryCount }), 5000)
             },
         },
     );
 
-    return { isLoading, isValidating };
+    return {
+        isLoading,
+        isValidating,
+        isServerDown: errorResult?.response?.status === 503,
+        serverDownStatus: errorResult?.response?.status,
+        serverDownMessage: errorResult?.response?.statusText,
+    };
 };

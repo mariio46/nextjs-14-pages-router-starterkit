@@ -62,7 +62,6 @@ export const useUpdatePassword = () => {
             const response = await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
 
             handleWhenUpdatingPasswordIsSuccess(response.data);
-            console.log(response);
         } catch (e: any) {
             const error: { current_password?: string[]; password?: string[] } = e.response?.data.errors;
             // prettier-ignore

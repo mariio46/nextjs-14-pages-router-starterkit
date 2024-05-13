@@ -93,6 +93,11 @@ const nextConfig = {
                 source: '/dashboard/users/:path*',
                 permanent: true,
             },
+            {
+                destination: '/roles/:path*',
+                source: '/dashboard/roles/:path*',
+                permanent: true,
+            },
         ];
     },
 
@@ -170,6 +175,10 @@ const nextConfig = {
             {
                 source: '/users/:path*',
                 destination: '/dashboard/users/:path*',
+            },
+            {
+                source: '/roles/:path*',
+                destination: '/dashboard/roles/:path*',
             },
         ];
     },

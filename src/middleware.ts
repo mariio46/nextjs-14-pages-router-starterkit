@@ -52,6 +52,7 @@ export const config = {
         '/dashboard',
         '/settings/:path*',
         '/users/:path*',
+        '/roles/:path*',
         '/login',
         '/register',
     ],
