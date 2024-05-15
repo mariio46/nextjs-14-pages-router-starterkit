@@ -1,11 +1,13 @@
-import axios from '@/lib/axios';
-import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
-import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api/response';
-import { AuthUserType } from '@/types/user';
 import { AxiosError } from 'axios';
 import { deleteCookie, hasCookie } from 'cookies-next';
 import useSWR from 'swr';
+
+import { ApiResponse } from '@/types/api/response';
+import { AuthUserType } from '@/types/user';
+
+import axios from '@/lib/axios';
+import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
 const authFetcher = (url: string) => axios.get(url, getClientSideAxiosHeaders()).then((res) => res.data);
@@ -16,7 +18,7 @@ export const useAuth = () => {
 
     // prettier-ignore
     const { isLoading, isValidating, error: errorResult } = useSWR<ApiResponse<AuthUserType>, AxiosError<{ message: string }>>('/user', authFetcher, {
-            shouldRetryOnError: true,
+            shouldRetryOnError: false,
             revalidateOnFocus: false,
             errorRetryInterval: 5000,
             refreshInterval: 1.5 * 60 * 1000, // 1.5 minute * 60 seconds * 1.5000 milliseconds = 1.5 minutes

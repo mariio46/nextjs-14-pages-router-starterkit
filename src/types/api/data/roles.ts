@@ -1,6 +1,6 @@
 import { ApiResponse } from '../response';
 
-type BaseRoleType = {
+export type BaseRoleType = {
     id: number;
     name: string;
     guard: string;

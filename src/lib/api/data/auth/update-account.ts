@@ -1,17 +1,26 @@
-import { useToast } from '@/components/ui/use-toast';
-import axios from '@/lib/axios';
-import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
-import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api/response';
-import { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
+
+import { User } from '@/types/user';
+
+import axios from '@/lib/axios';
+import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
+import { useAuthUserState } from '@/services/store/auth-user-state';
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 import { BE_UPDATE_ACCOUNT } from '../../end-point';
 
+import { useToast } from '@/components/ui/use-toast';
+
 type UpdateAccountResponse = ApiResponse<User>;
+
+type UpdateAccountErrorResponse = ApiValidationErrorResponse<{
+    name?: string[];
+    username?: string[];
+    email?: string[];
+}>;
 
 // prettier-ignore
 const updateAccountFormSchema = z.object({
@@ -52,24 +61,20 @@ export const useUpdateAccount = () => {
         },
     });
 
+    // prettier-ignore
     const submit = async (values: UpdateAccountFormFields): Promise<void> => {
-        try {
-            // prettier-ignore
-            const response = await axios.post<UpdateAccountResponse>(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders());
-
-            handleWhenUpdatingAccountIsSuccess(response.data);
-        } catch (e: any) {
-            const error: { name?: string[]; username?: string[]; email?: string[] } = e.response?.data.errors;
-            // prettier-ignore
-            handleAxiosError(e, toast, {
-                error_name :error?.name && form.setError('name', { message: error?.name[0] }),
-                error_username :error?.username && form.setError('username', { message: error?.username[0] }),
-                error_email :error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
-            })
-        }
+        await axios.post<UpdateAccountResponse>(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders())
+            .then((response) => handleWhenUpdatingAccountIsSuccess(response.data))
+            .catch((e: AxiosError<UpdateAccountErrorResponse>) => handleWhenUpdatingAccountIsFailed(e))
     };
 
     const handleWhenUpdatingAccountIsSuccess = (data: UpdateAccountResponse): void => {
+        form.reset({
+            name: data.data.name,
+            username: data.data.username,
+            email: data.data.email,
+        });
+
         // Revalidate Auth User State
         mutate('/user', data.data);
 
@@ -78,6 +83,23 @@ export const useUpdateAccount = () => {
             title: 'Success',
             description: data.message,
         });
+    };
+
+    const handleWhenUpdatingAccountIsFailed = (e: AxiosError<UpdateAccountErrorResponse>): void => {
+        if (e.response?.data.errors) {
+            const error = e.response.data.errors;
+            error?.name && form.setError('name', { message: error?.name[0] });
+            error?.username && form.setError('username', { message: error?.username[0] });
+            error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true });
+        } else {
+            console.error(e);
+            toast({
+                title: 'Failed!',
+                description: e.message,
+                variant: 'destructive',
+                duration: 10000,
+            });
+        }
     };
 
     return { submit, form };

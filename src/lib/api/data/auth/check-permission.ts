@@ -1,9 +1,11 @@
-import axios from '@/lib/axios';
-import { getServerSideAxiosHeaders } from '@/lib/cookies-next';
-import { ApiResponse } from '@/types/api/response';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Redirect } from 'next';
 import { NextApiRequestCookies } from 'next/dist/server/api-utils';
+
+import { ApiResponse } from '@/types/api/response';
+
+import axios from '@/lib/axios';
+import { getServerSideAxiosHeaders } from '@/lib/cookies-next';
 
 type RequestProps = IncomingMessage & { cookies: NextApiRequestCookies };
 type ResponseProps = ServerResponse;

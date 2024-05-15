@@ -11,13 +11,12 @@ import {
 } from '@tanstack/react-table';
 
 import { Icon } from '@/components/icon';
+import { Link } from '@/components/link';
 import { TableRowCellError } from '@/components/table-error';
 import { TableRowCellLoading } from '@/components/table-loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToggleDialog } from '@/hooks/use-toggle-dialog';
-import { DialogCreateRole } from './dialog-create-role';
 
 interface RolesDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -41,8 +40,6 @@ const RolesDataTable = <TData, TValue>({ columns, data, isLoading, isError }: Ro
         },
     });
 
-    const { openDialog, toggleDialog } = useToggleDialog();
-
     return (
         <div>
             <div className='flex items-center justify-end gap-2 py-4'>
@@ -53,10 +50,10 @@ const RolesDataTable = <TData, TValue>({ columns, data, isLoading, isError }: Ro
                     onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                     className='max-w-sm'
                 />
-                <Button onClick={toggleDialog}>
+                <Link href='/roles/create'>
                     <Icon name='IconCirclePlus' className='me-1' />
-                    Add New Role
-                </Button>
+                    Create Role
+                </Link>
             </div>
 
             <div className='rounded-md'>
@@ -141,8 +138,6 @@ const RolesDataTable = <TData, TValue>({ columns, data, isLoading, isError }: Ro
                     </Button>
                 </div>
             )}
-
-            <DialogCreateRole open={openDialog} onOpenChange={toggleDialog} />
         </div>
     );
 };

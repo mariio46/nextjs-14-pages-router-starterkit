@@ -1,14 +1,18 @@
-import { useToast } from '@/components/ui/use-toast';
-import axios from '@/lib/axios';
-import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { ApiResponse } from '@/types/api/response';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+
+import { useToast } from '@/components/ui/use-toast';
+import axios from '@/lib/axios';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 import { BE_REGISTER } from '../../end-point';
 
 type RegisterFormResponse = ApiResponse<string>;
+
+type RegisterErrorResponse = ApiValidationErrorResponse<{ name: string[]; email: string[]; password: string[] }>;
 
 // prettier-ignore
 const registerFormSchema = z.object({
@@ -37,26 +41,38 @@ export const useRegister = () => {
         },
     });
 
+    // prettier-ignore
     const submit = async (values: RegisterFormFields) => {
-        try {
-            const { data } = await axios.post<RegisterFormResponse>(BE_REGISTER, values);
+        await axios.post<RegisterFormResponse>(BE_REGISTER, values)
+            .then((response) => handleWhenRegisterSuccess(response.data))
+            .catch((e: AxiosError<RegisterErrorResponse>) => handleWhenRegisterFailed(e))
+    };
 
+    const handleWhenRegisterSuccess = (data: RegisterFormResponse): void => {
+        toast({
+            title: 'Success',
+            description: data.data,
+            duration: 2000,
+        });
+
+        form.reset();
+
+        router.push('/login');
+    };
+
+    const handleWhenRegisterFailed = (e: AxiosError<RegisterErrorResponse>): void => {
+        if (e.response?.data.errors) {
+            const error = e.response.data.errors;
+            error.name && form.setError('name', { message: error.name[0] });
+            error.email && form.setError('email', { message: error.email[0] }, { shouldFocus: true });
+            error.password && form.setError('password', { message: error.password[0] });
+        } else {
+            console.error(e);
             toast({
-                title: 'Success',
-                description: data.data,
-                duration: 2000,
-            });
-
-            form.reset();
-
-            setTimeout(() => router.push('/login'), 2100);
-        } catch (e: any) {
-            const error = e.response?.data.errors;
-            // prettier-ignore
-            handleAxiosError(e, toast, {
-                error_name: error?.name && form.setError('name', { message: error?.name[0] }),
-                error_email: error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
-                error_password: error?.password && form.setError('password', { message: error?.password[0] }),
+                title: 'Failed!',
+                description: e.message,
+                variant: 'destructive',
+                duration: 10000,
             });
         }
     };

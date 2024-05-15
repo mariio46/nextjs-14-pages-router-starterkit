@@ -22,10 +22,16 @@ export const SideNavigation = () => {
                         </SideNavigationLink>
                     )}
                     {useHasPermission('management role permission') && (
-                        <SideNavigationLink href='/roles'>
-                            <Icon name='IconSpy' />
-                            Roles
-                        </SideNavigationLink>
+                        <>
+                            <SideNavigationLink href='/roles'>
+                                <Icon name='IconSpy' />
+                                Roles
+                            </SideNavigationLink>
+                            <SideNavigationLink href='/permissions'>
+                                <Icon name='IconLicense' />
+                                Permissions
+                            </SideNavigationLink>
+                        </>
                     )}
                 </ul>
             </div>

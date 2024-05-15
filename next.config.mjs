@@ -98,6 +98,11 @@ const nextConfig = {
                 source: '/dashboard/roles/:path*',
                 permanent: true,
             },
+            {
+                destination: '/permissions/:path*',
+                source: '/dashboard/permissions/:path*',
+                permanent: true,
+            },
         ];
     },
 
@@ -179,6 +184,10 @@ const nextConfig = {
             {
                 source: '/roles/:path*',
                 destination: '/dashboard/roles/:path*',
+            },
+            {
+                source: '/permissions/:path*',
+                destination: '/dashboard/permissions/:path*',
             },
         ];
     },

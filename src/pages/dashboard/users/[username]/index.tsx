@@ -1,76 +1,51 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
-import { Icon } from '@/components/icon';
-import { AuthLayout } from '@/components/layouts/auth-layout';
-import { RootLayout } from '@/components/layouts/root-layout';
-import { Link } from '@/components/link';
-import { DetailUserBlocks } from '@/components/pages/dashboard/users/detail-user-blocks';
-import { DetailUserSkeleton } from '@/components/pages/dashboard/users/detail-user-skeleton';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
+
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSingleUser } from '@/lib/api/data/users/fetch-users';
-import { initialWord } from '@/lib/utils';
-import { NextPageWithLayout } from '@/pages/_app';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+
+import { Icon } from '@/components/icon';
+import { AuthLayout } from '@/components/layouts/auth-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
+import { SecondShell } from '@/components/layouts/shells/second-shell';
+import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
+import { Link } from '@/components/link';
+import { DetailUserBlocks } from '@/components/pages/dashboard/users/detail-user-blocks';
+import { DetailUserSkeleton } from '@/components/pages/dashboard/users/detail-user-skeleton';
 
 type UserDetailPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-export const getServerSideProps = (async ({ req, res }) => {
+export const getServerSideProps = (async ({ req, res, query }) => {
     const token_status = await authUserTokenValidation(req, res);
-
-    if (!token_status.authenticated) {
-        return RedirectIfUnauthencated;
-    }
-
     const permission_status = await useCheckPermission('management users', { req, res });
 
-    if (!permission_status.authorized) {
-        return RedirectIfUnauthorized;
-    }
+    if (!token_status.authenticated) return RedirectIfUnauthencated;
+    if (!permission_status.authorized) return RedirectIfUnauthorized;
 
-    return {
-        props: {},
-    };
-}) satisfies GetServerSideProps;
+    return { props: { username: query.username as string } };
+}) satisfies GetServerSideProps<{ username: string }>;
 
-const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = () => {
-    const { query } = useRouter();
-    const username = query.username as string;
+const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = ({ username }) => {
+    const { data, isLoading, isError } = useFetchSingleUser(username);
 
-    const { data, isLoading, isError } = useFetchSingleUser(username as string);
-
-    const title: string = data?.data.user ? `Detail ${initialWord(data?.data.user.name)}` : 'Detail User';
+    const breadcrumbData = [
+        {
+            as: 'link',
+            link: '/users',
+            title: 'Users',
+        },
+        {
+            as: 'page',
+            title: 'Detail User',
+        },
+    ] satisfies BreadcrumbDataType[];
 
     return (
-        <>
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <NextLink href='/users'>Users</NextLink>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>{title}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-
+        <SecondShell>
+            <ShellBreadcrumb data={breadcrumbData} />
             <div className='flex flex-wrap items-center justify-between'>
-                <HeaderPrimary className='my-5 space-y-0.5'>
-                    <HeaderPrimaryTitle className='text-base'>{title}</HeaderPrimaryTitle>
-                    <HeaderPrimaryDescription>Detail user that contain their information.</HeaderPrimaryDescription>
-                </HeaderPrimary>
+                <SecondShell.Header title='Detail User' description='Detail user that contain their information.' />
                 <Link href={`/users/${username}/edit`}>
                     <Icon name='IconEdit' className='me-1' />
                     Edit User
@@ -80,7 +55,7 @@ const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = () => {
             <section id='detail-user'>
                 {isLoading || isError ? <DetailUserSkeleton /> : <DetailUserBlocks user={data?.data.user!} />}
             </section>
-        </>
+        </SecondShell>
     );
 };
 

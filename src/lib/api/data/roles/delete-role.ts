@@ -2,6 +2,7 @@ import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { FETCH_ALL_ROLES_KEY } from '@/lib/query-key';
+import { RoleIndexType, RoleShowType } from '@/types/api/data/roles';
 import { ApiResponse } from '@/types/api/response';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -14,7 +15,7 @@ const deleteRole = async (id: number) => {
     return data;
 };
 
-export const useDeleteRole = (closeDialog: () => void) => {
+export const useDeleteRole = (closeDialog: () => void, role: RoleShowType | RoleIndexType) => {
     const queryClient = useQueryClient();
 
     const { toast } = useToast();
@@ -40,6 +41,11 @@ export const useDeleteRole = (closeDialog: () => void) => {
             });
 
             if (router.asPath !== '/roles') router.push('/roles');
+
+            queryClient.removeQueries({
+                queryKey: [FETCH_ALL_ROLES_KEY, `role-with-id-${role.id}`],
+                exact: true,
+            });
 
             return queryClient.invalidateQueries({
                 queryKey: [FETCH_ALL_ROLES_KEY],

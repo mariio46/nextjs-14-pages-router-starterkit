@@ -1,13 +1,15 @@
-import { AuthLayout } from '@/components/layouts/auth-layout';
-import { RootLayout } from '@/components/layouts/root-layout';
-import { AuthShellPrimary } from '@/components/layouts/shells/auth-shell-primary';
-import { userColumns } from '@/components/pages/dashboard/users/column';
-import { DataTable } from '@/components/pages/dashboard/users/data-table';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
+
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchAllUsers } from '@/lib/api/data/users/fetch-users';
-import { type NextPageWithLayout } from '@/pages/_app';
-import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
+
+import { AuthLayout } from '@/components/layouts/auth-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
+import { FirstShell } from '@/components/layouts/shells/first-shell';
+import { userColumns } from '@/components/pages/dashboard/users/column';
+import { DataTable } from '@/components/pages/dashboard/users/data-table';
 
 type UsersPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -29,13 +31,16 @@ const Users: NextPageWithLayout<UsersPageProps> = () => {
     if (isError) console.error(error);
 
     return (
-        <AuthShellPrimary
-            title='Users'
-            description='list of all users, you can create, update, and delete user you choose.'>
-            <section id='users-table' className='my-10'>
+        <FirstShell>
+            <FirstShell.Header
+                title='Users'
+                description='list of all users, you can create, update, and delete user you choose.'
+            />
+
+            <section id='users-table' className='my-5'>
                 <DataTable isLoading={isLoading} isError={isError} data={data!} columns={userColumns} />
             </section>
-        </AuthShellPrimary>
+        </FirstShell>
     );
 };
 

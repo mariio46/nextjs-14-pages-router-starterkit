@@ -1,11 +1,12 @@
+import { AxiosError, isAxiosError } from 'axios';
+import { deleteCookie } from 'cookies-next';
+import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
+
 import { useLoading } from '@/hooks/use-loading';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
-import { AxiosError } from 'axios';
-import { deleteCookie } from 'cookies-next';
-import { useRouter } from 'next/router';
-import { useSWRConfig } from 'swr';
 import { BE_LOGOUT } from '../../end-point';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
@@ -24,22 +25,17 @@ export const useLogout = () => {
         router.push(`/login?callback=${router.asPath.toString()}`);
     };
 
+    const handleWhenLogoutIsFailed = (e: AxiosError): void => {
+        isAxiosError(e) ? clearCookieAndAuth() : console.error(e);
+    };
+
+    // prettier-ignore
     const logout = async () => {
         startLoading();
-        try {
-            await axios.post(BE_LOGOUT, {}, getClientSideAxiosHeaders());
-            clearCookieAndAuth();
-        } catch (error: any) {
-            if (error instanceof AxiosError && error.response?.status === 401) {
-                clearCookieAndAuth();
-            } else if (error instanceof AxiosError && error.response?.status !== 401) {
-                clearCookieAndAuth();
-            } else {
-                console.error(error);
-            }
-        } finally {
-            stopLoading();
-        }
+        await axios.post(BE_LOGOUT, {}, getClientSideAxiosHeaders())
+            .then(() => clearCookieAndAuth())
+            .catch((e: AxiosError) => handleWhenLogoutIsFailed(e))
+            .finally(() => stopLoading());
     };
 
     return { loading, logout };

@@ -1,84 +1,113 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { RoleShowType } from '@/types/api/data/roles';
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+
 import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { FETCH_ALL_ROLES_KEY } from '@/lib/query-key';
-import { RoleIndexType, RoleShowType } from '@/types/api/data/roles';
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { MultipleSelectOption, multipleSelectOptionSchema } from '@/lib/schema/multiple-select-option-schema';
+import { capitalize } from '@/lib/utils';
 
-type EditRoleFormResponse = ApiResponse<RoleIndexType>;
-
-type EditUserErrorResponse = ApiValidationErrorResponse<{ name?: string[] }>;
-
-// prettier-ignore
-const editRoleFormSchema = z.object({
-    name: z.string().min(1, 'The name field is required.').min(3, 'The name field must be at least 3 characters.').toLowerCase(),
-});
-
+type EditRoleResponse = ApiResponse<RoleShowType>;
+type EditRoleErrorResponse = AxiosError<ApiValidationErrorResponse<{ name?: string[]; permissions: string[] }>>;
+type SubmitRoleType = { id?: number; name: string; permissions: string[] };
 type EditRoleFormFields = z.infer<typeof editRoleFormSchema>;
 
-type UpdateRoleProps = {
-    values: EditRoleFormFields;
-    id: number;
-};
+const editRoleFormSchema = z.object({
+    // prettier-ignore
+    name: z.string({ required_error: 'The name field is required.' }).min(3, 'The name field must be at least 3 characters.').toLowerCase(),
+    permissions: z.array(multipleSelectOptionSchema, { required_error: 'Please select at least 1 permission.' }),
+});
 
-// prettier-ignore
-const updateRole = async (opts: UpdateRoleProps) => {
-    return await axios.put<EditRoleFormResponse>(`/roles/${opts.id}/update`, opts.values, getClientSideAxiosHeaders()).then(res => res.data);
-}
-
-export const useUpdateRole = (closeDialog: () => void, initialData: RoleIndexType | RoleShowType) => {
+export const useEditRole = (initialData: RoleShowType | undefined) => {
     const queryClient = useQueryClient();
 
     const { toast } = useToast();
+    const router = useRouter();
 
     const form = useForm<EditRoleFormFields>({
         resolver: zodResolver(editRoleFormSchema),
         defaultValues: {
-            name: initialData.name,
+            name: initialData?.name,
+            permissions: transformToFormData(initialData),
         },
     });
 
-    // prettier-ignore
-    const { mutateAsync, isPending } = useMutation<EditRoleFormResponse, AxiosError<EditUserErrorResponse>, UpdateRoleProps>({
-        mutationKey: [`update-role-with-id-${initialData.id}`],
-        mutationFn: updateRole,
-        onSuccess: (data, variables, context) => {
-            closeDialog();
-
-            form.reset({ name: data.data.name });
-
-            toast({
-                title: 'Success',
-                description: 'Role has been updated successfully.',
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: [FETCH_ALL_ROLES_KEY, `role-with-id-${initialData.id}`],
-            });
-
-            return queryClient.invalidateQueries({
-                queryKey: [FETCH_ALL_ROLES_KEY],
-            });
-        },
-        onError: (error, variables, context) => {
-            if (error.response?.status === 422) {
-                const errors = error.response.data.errors;
-                errors?.name && form.setError('name', { message: errors.name[0] });
-            } else {
-                console.log({ error, variables, context });
-            }
-        },
+    const { mutateAsync, isPending } = useMutation<EditRoleResponse, EditRoleErrorResponse, SubmitRoleType>({
+        mutationKey: [`update-role-with-id-${initialData?.id}`],
+        mutationFn: submitUpdatedRoleToServer,
+        onSuccess: (data) => handleWhenUpdateRoleIsSuccess(data),
+        onError: (error) => handleWhenUpdateRoleIsFailed(error),
     });
 
-    // prettier-ignore
-    const submit = async (opts: UpdateRoleProps) => {
-        return await mutateAsync({ values: opts.values, id: opts.id }).then((r) => r).catch((e) => e);
+    const handleWhenUpdateRoleIsSuccess = (data: EditRoleResponse) => {
+        form.reset({
+            name: data.data.name,
+            permissions: transformToFormData(data.data),
+        });
+
+        router.push(`/roles/${data.data.id}`);
+
+        toast({
+            title: 'Success',
+            description: 'Role has been updated successfully.',
+        });
+
+        queryClient.invalidateQueries({
+            queryKey: [FETCH_ALL_ROLES_KEY, `role-with-id-${initialData?.id}`],
+        });
+
+        return queryClient.invalidateQueries({
+            queryKey: [FETCH_ALL_ROLES_KEY],
+        });
     };
 
-    return { submit, isPending, form };
+    const handleWhenUpdateRoleIsFailed = (error: EditRoleErrorResponse): void => {
+        if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            errors?.name && form.setError('name', { message: errors.name[0] });
+            errors?.permissions && form.setError('permissions', { message: errors.permissions[0] });
+        } else {
+            console.log({ error });
+        }
+    };
+
+    const submit = async (values: EditRoleFormFields) => {
+        const submittedData = {
+            id: initialData?.id,
+            name: values.name,
+            permissions: values.permissions.map((p) => p.value),
+        } satisfies SubmitRoleType;
+
+        // prettier-ignore
+        return await mutateAsync(submittedData).then(res => res).catch(e => e);
+    };
+
+    return { form, asyncSubmit: submit, isMutationPending: isPending };
 };
+
+const transformToFormData = (data: RoleShowType | undefined) => {
+    const formData: MultipleSelectOption[] | undefined =
+        data &&
+        data.permissions &&
+        data.permissions.map((permission) => {
+            return {
+                label: capitalize(permission.name),
+                value: permission.name,
+            };
+        });
+
+    return formData;
+};
+
+// prettier-ignore
+const submitUpdatedRoleToServer = async (opts: SubmitRoleType) => {
+    return await axios.put<EditRoleResponse>(`/roles/${opts.id}/update`, opts, getClientSideAxiosHeaders()).then(res => res.data);
+}

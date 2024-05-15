@@ -1,14 +1,14 @@
-import type { NextPageWithLayout } from '@/pages/_app';
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
 
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSingleRole } from '@/lib/api/data/roles/fetch-roles';
-import { useRoleShellSecondaryData } from '@/lib/utilities/shell-secondary-data';
 
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { AuthShellSecondary } from '@/components/layouts/shells/auth-shell-secondary';
+import { SecondShell } from '@/components/layouts/shells/second-shell';
+import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
 import { RoleDetailAction } from '@/components/pages/dashboard/roles/detail/role-detail-action';
 import { RoleDetailBlocks } from '@/components/pages/dashboard/roles/detail/role-detail-blocks';
 
@@ -21,31 +21,46 @@ export const getServerSideProps = (async ({ req, res, query }) => {
     if (!token_status.authenticated) return RedirectIfUnauthencated;
     if (!permission_status.authorized) return RedirectIfUnauthorized;
 
-    return {
-        props: {
-            id: query.id,
-        },
-    };
-}) satisfies GetServerSideProps<{ id: string | string[] | undefined }>;
+    return { props: { id: query.id as string } };
+}) satisfies GetServerSideProps<{ id: string }>;
 
 const RoleDetailPage: NextPageWithLayout<RoleDetailPageProps> = ({ id: roleId }) => {
-    const { role, isLoading, isError } = useFetchSingleRole(roleId as string);
+    const { role, isLoading, isError } = useFetchSingleRole(roleId);
 
-    const roleShellSecondaryData = useRoleShellSecondaryData(role);
+    const breadcrumbData = [
+        {
+            as: 'link',
+            link: '/roles',
+            title: 'Roles',
+        },
+        {
+            as: 'page',
+            title: 'Detail Role',
+        },
+    ] satisfies BreadcrumbDataType[];
 
     return (
-        <AuthShellSecondary {...{ ...roleShellSecondaryData }} Action={() => <RoleDetailAction role={role!} />}>
+        <SecondShell>
+            <ShellBreadcrumb data={breadcrumbData} />
+            <div className='flex items-center flex-wrap justify-between'>
+                <SecondShell.Header
+                    title='Detail Role'
+                    description='Detail role that contain their information like permission that role have and which user is assign to this role.'
+                />
+                <RoleDetailAction role={role!} />
+            </div>
+
             <section id='detail-role'>
                 <RoleDetailBlocks role={role!} isLoading={isLoading} isError={isError} />
             </section>
-        </AuthShellSecondary>
+        </SecondShell>
     );
 };
 
 RoleDetailPage.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthLayout>{page}</AuthLayout>
+            <AuthLayout title='Detail Role'>{page}</AuthLayout>
         </RootLayout>
     );
 };

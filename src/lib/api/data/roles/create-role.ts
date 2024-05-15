@@ -1,75 +1,91 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { RoleIndexType } from '@/types/api/data/roles';
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+
 import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { FETCH_ALL_ROLES_KEY } from '@/lib/query-key';
-import { RoleIndexType } from '@/types/api/data/roles';
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { multipleSelectOptionSchema } from '@/lib/schema/multiple-select-option-schema';
 
-type CreateRoleFormResponse = ApiResponse<RoleIndexType>;
-
-type CreateUserErrorResponse = ApiValidationErrorResponse<{ name?: string[] }>;
-
-// prettier-ignore
-const createRoleFormSchema = z.object({
-    name: z.string().min(1, 'The name field is required.').min(3, 'The name field must be at least 3 characters.').toLowerCase(),
-});
-
+type CreateRoleResponse = ApiResponse<RoleIndexType>;
+type CreateRoleErrorResponse = AxiosError<ApiValidationErrorResponse<{ name?: string[]; permissions: string[] }>>;
+type SubmitRoleType = { name: string; permissions: string[] };
 type CreateRoleFormFields = z.infer<typeof createRoleFormSchema>;
 
-// prettier-ignore
-const createRole = async (values: CreateRoleFormFields) => {
-    return await axios.post<CreateRoleFormResponse>('/roles/store', values, getClientSideAxiosHeaders()).then((res) => res.data);
-};
+const createRoleFormSchema = z.object({
+    // prettier-ignore
+    name: z.string({ required_error: 'The name field is required.' }).min(3, 'The name field must be at least 3 characters.').toLowerCase(),
+    permissions: z.array(multipleSelectOptionSchema, { required_error: 'Please select at least 1 permission.' }),
+});
 
-export const useCreateRole = (closeDialog: () => void) => {
+export const useCreateNewRole = () => {
     const queryClient = useQueryClient();
 
     const { toast } = useToast();
+    const router = useRouter();
 
     const form = useForm<CreateRoleFormFields>({
         resolver: zodResolver(createRoleFormSchema),
         defaultValues: {
             name: '',
+            permissions: [],
         },
     });
 
-    // prettier-ignore
-    const { mutateAsync, isPending } = useMutation<CreateRoleFormResponse, AxiosError<CreateUserErrorResponse>, CreateRoleFormFields>({
+    const mutation = useMutation<CreateRoleResponse, CreateRoleErrorResponse, SubmitRoleType>({
         mutationKey: ['create-role'],
-        mutationFn: createRole,
-        onSuccess: (data, variables, context) => {
-            form.reset();
-
-            queryClient.invalidateQueries({
-                queryKey: [FETCH_ALL_ROLES_KEY],
-            });
-
-            closeDialog();
-
-            toast({
-                title: 'Success',
-                description: 'Role has ben created successfully.',
-            });
-        },
-        onError: (error, variables, context) => {
-            if (error.response?.status === 422) {
-                const errors = error.response.data.errors;
-                errors?.name && form.setError('name', { message: errors.name[0] });
-            } else {
-                console.log({ error, variables, context });
-            }
-        },
+        mutationFn: submitNewRoleToServer,
+        onSuccess: () => handleWhenCreateRoleIsSuccess(),
+        onError: (error) => handleWhenCreateRoleIsFailed(error),
     });
 
-    // prettier-ignore
-    const submit = async (values: CreateRoleFormFields) => {
-        return await mutateAsync(values).then((res) => res).catch((e) => e);
+    const handleWhenCreateRoleIsSuccess = (): void => {
+        form.resetField('name', { defaultValue: '' });
+        form.resetField('permissions', { defaultValue: [] });
+
+        queryClient.invalidateQueries({
+            queryKey: [FETCH_ALL_ROLES_KEY],
+        });
+
+        toast({
+            title: 'Success',
+            description: 'Role has ben created successfully.',
+        });
+
+        router.push('/roles');
     };
 
-    return { submit, form, isPending };
+    const handleWhenCreateRoleIsFailed = (error: CreateRoleErrorResponse): void => {
+        if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            errors?.name && form.setError('name', { message: errors.name[0] });
+            errors?.permissions && form.setError('permissions', { message: errors.permissions[0] });
+        } else {
+            console.log({ error });
+        }
+    };
+
+    const submit = async (values: CreateRoleFormFields) => {
+        const submittedData: SubmitRoleType = {
+            name: values.name,
+            permissions: values.permissions.map((permission) => permission.value),
+        };
+
+        // prettier-ignore
+        return await mutation.mutateAsync(submittedData).then((res) => res).catch((e) => e);
+    };
+
+    return { asyncSubmit: submit, form };
+};
+
+// prettier-ignore
+const submitNewRoleToServer = async (values: SubmitRoleType) => {
+    return await axios.post<CreateRoleResponse>('/roles/store', values, getClientSideAxiosHeaders()).then((res) => res.data);
 };

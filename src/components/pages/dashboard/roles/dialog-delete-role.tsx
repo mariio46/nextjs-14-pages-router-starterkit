@@ -21,7 +21,7 @@ interface DialogDeleteRoleProps {
 }
 
 const DialogDeleteRole: React.FC<DialogDeleteRoleProps> = ({ role, children, open, onOpenChange }) => {
-    const { handleDeleteRole, isPending } = useDeleteRole(onOpenChange);
+    const { handleDeleteRole, isPending } = useDeleteRole(onOpenChange, role);
     return (
         <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
             <DialogTrigger asChild>{children}</DialogTrigger>

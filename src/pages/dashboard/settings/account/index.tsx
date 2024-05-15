@@ -1,19 +1,13 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
-import { AuthLayout } from '@/components/layouts/auth-layout';
-import { RootLayout } from '@/components/layouts/root-layout';
-import { UpdateAccountForm } from '@/components/pages/dashboard/settings/account/form';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type NextPageWithLayout } from '@/pages/_app';
 import { type GetServerSideProps } from 'next';
-import Link from 'next/link';
+
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+
+import { AuthLayout } from '@/components/layouts/auth-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
+import { SecondShell } from '@/components/layouts/shells/second-shell';
+import { BreadcrumbDataType, ShellBreadcrumb } from '@/components/layouts/shells/shell-breadcrumb';
+import { UpdateAccountForm } from '@/components/pages/dashboard/settings/account/form';
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
@@ -26,38 +20,32 @@ export const getServerSideProps = (async ({ req, res }) => {
 }) satisfies GetServerSideProps;
 
 const Account: NextPageWithLayout = () => {
-    return (
-        <>
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link href='/settings'>Settings</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Account</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+    const data = [
+        {
+            as: 'link',
+            link: '/settings',
+            title: 'Settings',
+        },
+        {
+            as: 'page',
+            title: 'Account',
+        },
+    ] satisfies BreadcrumbDataType[];
 
-            <HeaderPrimary className='my-5 space-y-0.5'>
-                <HeaderPrimaryTitle className='text-base'>Account Information</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>
-                    Update your name, username, and email to update your profile information.
-                    <span className='font-bold'>You can submit form if you make a changes.</span>
-                </HeaderPrimaryDescription>
-            </HeaderPrimary>
+    return (
+        <SecondShell>
+            <ShellBreadcrumb data={data} />
+            <SecondShell.Header
+                title='Account Information'
+                description='Update your name, username, and email to update your profile information.'
+            />
 
             <section id='update-account-form'>
-                <div className='mx-auto max-w-7xl'>
-                    <div className='max-w-xl'>
-                        <UpdateAccountForm />
-                    </div>
+                <div className='max-w-xl'>
+                    <UpdateAccountForm />
                 </div>
             </section>
-        </>
+        </SecondShell>
     );
 };
 

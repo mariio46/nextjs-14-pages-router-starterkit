@@ -14,11 +14,9 @@ import { Button } from '@/components/ui/button';
 import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 import { RoleIndexType } from '@/types/api/data/roles';
 import { DialogDeleteRole } from './dialog-delete-role';
-import { DialogEditRole } from './dialog-edit-role';
 
 export const RolesColumnDropdownAction: React.FC<{ role: RoleIndexType }> = ({ role }) => {
     const { toggleDialog: setDeleteUserDialog, openDialog: deleteUserDialog } = useToggleDialog();
-    const { toggleDialog: setUpdateUserDialog, openDialog: updateUserDialog } = useToggleDialog();
 
     return (
         <div className='text-end'>
@@ -38,12 +36,12 @@ export const RolesColumnDropdownAction: React.FC<{ role: RoleIndexType }> = ({ r
                             View
                         </Link>
                     </DropdownMenuItem>
-                    <DialogEditRole open={updateUserDialog} onOpenChange={setUpdateUserDialog} role={role}>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/roles/${role.id}/edit`}>
                             <Icon name='IconEdit' className='me-1.5 stroke-[1.3]' />
                             Edit
-                        </DropdownMenuItem>
-                    </DialogEditRole>
+                        </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DialogDeleteRole open={deleteUserDialog} onOpenChange={setDeleteUserDialog} role={role}>
                         <DropdownMenuItem className='focus:text-destructive' onSelect={(e) => e.preventDefault()}>
