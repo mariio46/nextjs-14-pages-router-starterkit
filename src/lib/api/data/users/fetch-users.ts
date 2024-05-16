@@ -14,19 +14,19 @@ const getSingleUser = async (username: string) => {
 };
 
 export const useFetchAllUsers = () => {
-    const { data, isLoading, isError, error } = useQuery<UsersType[]>({
+    const { data, isLoading, isError, error, status } = useQuery<UsersType[]>({
         queryKey: [FETCH_ALL_USERS_KEY],
         queryFn: getAllUsers,
     });
 
-    return { data, isLoading, isError, error };
+    return { users: data, isLoading, isError, error, status };
 };
 
 export const useFetchSingleUser = (username: string) => {
-    const { data, isLoading, isError, error } = useQuery<ApiResponse<{ user: SingleUserType }>>({
+    const { data, isLoading, isError, error, status } = useQuery<ApiResponse<{ user: SingleUserType }>>({
         queryKey: [username],
         queryFn: () => getSingleUser(username),
     });
 
-    return { data, isLoading, isError, error };
+    return { user: data?.data.user, isLoading, isError, error, status };
 };

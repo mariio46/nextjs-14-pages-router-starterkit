@@ -1,3 +1,6 @@
+import { useDeleteUser } from '@/lib/api/data/users/delete-user';
+import { UsersType } from '@/types/api/data/users';
+
 import { SubmitButton } from '@/components/submit-button';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,21 +13,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { useDeleteUser } from '@/lib/api/data/users/delete-user';
-import { UsersType } from '@/types/api/data/users';
-import React from 'react';
+import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 
-interface DialogDeleteUserProps {
+interface UserDeleteDialogProps {
     user: UsersType;
     children: React.ReactNode;
 }
 
-const DialogDeleteUser: React.FC<DialogDeleteUserProps> = ({ user, children }) => {
+const UserDeleteDialog = ({ user, children }: UserDeleteDialogProps) => {
+    const { openDialog, toggleDialog } = useToggleDialog();
     const { handleDeleteUser, isPending, loading } = useDeleteUser();
 
     const deleteUseAction = () => handleDeleteUser(user.username);
+
     return (
-        <Dialog key={`${user.id}${user.username}`}>
+        <Dialog open={openDialog} onOpenChange={toggleDialog}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -70,4 +73,4 @@ const DialogDeleteUser: React.FC<DialogDeleteUserProps> = ({ user, children }) =
     );
 };
 
-export { DialogDeleteUser };
+export { UserDeleteDialog };

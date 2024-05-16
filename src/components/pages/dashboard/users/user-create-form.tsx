@@ -1,12 +1,9 @@
 import { SubmitButton } from '@/components/submit-button';
-import { buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useCreateUser } from '@/lib/api/data/users/create-user';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
-export const CreateUserForm = () => {
+export const UserCreateForm = () => {
     const { submit, isPending, form } = useCreateUser();
 
     return (
@@ -56,12 +53,8 @@ export const CreateUserForm = () => {
                         </FormItem>
                     )}
                 />
-                <div className='flex justify-start gap-4'>
-                    <Link href='/users' className={cn(buttonVariants({ variant: 'outline' }))}>
-                        Back
-                    </Link>
-                    <SubmitButton disabledWhen={isPending} defaultLabel='Save' onLoadingLabel='Saving...' />
-                </div>
+
+                <SubmitButton disabledWhen={isPending} defaultLabel='Save' onLoadingLabel='Saving...' />
             </form>
         </Form>
     );

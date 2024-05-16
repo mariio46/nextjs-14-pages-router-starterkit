@@ -11,8 +11,8 @@ import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
 import { Link } from '@/components/link';
-import { DetailUserBlocks } from '@/components/pages/dashboard/users/detail-user-blocks';
-import { DetailUserSkeleton } from '@/components/pages/dashboard/users/detail-user-skeleton';
+import { UserDetailBlocks } from '@/components/pages/dashboard/users/detail/user-detail-blocks';
+import { UserDetailSkeleton } from '@/components/pages/dashboard/users/detail/user-detail-skeleton';
 
 type UserDetailPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -27,7 +27,7 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 }) satisfies GetServerSideProps<{ username: string }>;
 
 const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = ({ username }) => {
-    const { data, isLoading, isError } = useFetchSingleUser(username);
+    const { user, status } = useFetchSingleUser(username);
 
     const breadcrumbData = [
         {
@@ -44,16 +44,21 @@ const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = ({ username }) =
     return (
         <SecondShell>
             <ShellBreadcrumb data={breadcrumbData} />
-            <div className='flex flex-wrap items-center justify-between'>
-                <SecondShell.Header title='Detail User' description='Detail user that contain their information.' />
+            <SecondShell.HeaderContainer className='my-5'>
+                <SecondShell.Header
+                    className='my-0'
+                    title='Detail User'
+                    description='Detail user that contain their information.'
+                />
+
                 <Link href={`/users/${username}/edit`}>
                     <Icon name='IconEdit' className='me-1' />
                     Edit User
                 </Link>
-            </div>
+            </SecondShell.HeaderContainer>
 
             <section id='detail-user'>
-                {isLoading || isError ? <DetailUserSkeleton /> : <DetailUserBlocks user={data?.data.user!} />}
+                {status !== 'success' ? <UserDetailSkeleton /> : <UserDetailBlocks user={user!} />}
             </section>
         </SecondShell>
     );

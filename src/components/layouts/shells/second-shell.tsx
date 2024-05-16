@@ -1,20 +1,21 @@
 import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
 import { cn } from '@/lib/utils';
 
-const SecondShellHeader = ({ title, description }: { title: string; description: string }) => {
+interface SecondShellHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+    title: string;
+    description: string;
+}
+
+const SecondShellHeader = ({ title, description, className, ...props }: SecondShellHeaderProps) => {
     return (
-        <HeaderPrimary className='my-5 space-y-0.5'>
+        <HeaderPrimary className={cn('my-5 space-y-0.5', className)} {...props}>
             <HeaderPrimaryTitle className='text-base'>{title}</HeaderPrimaryTitle>
             <HeaderPrimaryDescription>{description}</HeaderPrimaryDescription>
         </HeaderPrimary>
     );
 };
 
-const SecondShellHeaderContainerAction: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-    className,
-    children,
-    ...props
-}) => {
+const SecondShellHeaderContainerAction = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
         <div className={cn('flex flex-wrap gap-2.5 items-center justify-between', className)} {...props}>
             {children}
@@ -22,8 +23,8 @@ const SecondShellHeaderContainerAction: React.FC<React.HTMLAttributes<HTMLDivEle
     );
 };
 
-const SecondShell = ({ children }: { children: React.ReactNode }) => {
-    return <div>{children}</div>;
+const SecondShell = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+    return <div {...props}>{children}</div>;
 };
 
 SecondShell.HeaderContainer = SecondShellHeaderContainerAction;

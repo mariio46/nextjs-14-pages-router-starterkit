@@ -5,11 +5,12 @@ import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSingleUser } from '@/lib/api/data/users/fetch-users';
 
+import { FormSkeleton } from '@/components/form-skeleton';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { EditUserForm } from '@/components/pages/dashboard/users/edit-form';
+import { UserEditForm } from '@/components/pages/dashboard/users/user-edit-form';
 
 type UserEditPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -24,7 +25,7 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 }) satisfies GetServerSideProps<{ username: string }>;
 
 const UserEditPage: NextPageWithLayout<UserEditPageProps> = ({ username }) => {
-    const { data, isLoading, isError } = useFetchSingleUser(username);
+    const { user, status } = useFetchSingleUser(username);
     const breadcrumbData = [
         {
             as: 'link',
@@ -48,7 +49,7 @@ const UserEditPage: NextPageWithLayout<UserEditPageProps> = ({ username }) => {
             <SecondShell.Header title='Edit User' description='Detail user that contain their information.' />
 
             <section id='edit-user-form' className='max-w-xl'>
-                {!isLoading && !isError && <EditUserForm user={data?.data.user!} />}
+                {status !== 'success' ? <FormSkeleton inputLength={3} /> : <UserEditForm user={user!} />}
             </section>
         </SecondShell>
     );

@@ -3,11 +3,11 @@ import { SingleUserType } from '@/types/api/data/users';
 import Image from 'next/image';
 import React from 'react';
 
-interface DetailUserBlocksProps {
+interface UserDetailBlocksProps {
     user: SingleUserType;
 }
 
-export const DetailUserBlocks: React.FC<DetailUserBlocksProps> = ({ user }) => {
+export const UserDetailBlocks: React.FC<UserDetailBlocksProps> = ({ user }) => {
     return (
         <div className='flex flex-wrap items-start gap-5 md:gap-10'>
             <div className='w-full flex justify-center md:w-auto md:justify-start'>

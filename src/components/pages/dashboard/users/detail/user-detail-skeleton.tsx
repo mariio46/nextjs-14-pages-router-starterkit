@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const DetailUserSkeleton: React.FC = () => {
+export const UserDetailSkeleton: React.FC = () => {
     return (
         <div className='flex items-start gap-10'>
             <div className='rounded-md overflow-hidden'>

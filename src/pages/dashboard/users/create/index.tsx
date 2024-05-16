@@ -8,7 +8,7 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { CreateUserForm } from '@/components/pages/dashboard/users/create-form';
+import { UserCreateForm } from '@/components/pages/dashboard/users/user-create-form';
 
 type UserCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -41,7 +41,7 @@ const UserCreatePage: NextPageWithLayout<UserCreatePageProps> = () => {
             <SecondShell.Header title='Create New User' description='Fill all the field below to add one user.' />
 
             <section id='create-user-form' className='max-w-xl'>
-                <CreateUserForm />
+                <UserCreateForm />
             </section>
         </SecondShell>
     );
