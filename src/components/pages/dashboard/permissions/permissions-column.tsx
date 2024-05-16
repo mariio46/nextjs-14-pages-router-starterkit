@@ -9,7 +9,7 @@ import { Icon } from '@/components/icon';
 import { DataTableColumnDropdownAction } from '@/components/tanstack/data-table-column-dropdown-action';
 import { DataTableColumnHeader } from '@/components/tanstack/data-table-column-header';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { DialogDeletePermission } from './dialog-delete-permission';
+import { PermissionDeleteDialog } from './permission-delete-dialog';
 
 export const permissionsColumn: ColumnDef<PermissionIndexType>[] = [
     {
@@ -66,12 +66,12 @@ export const permissionsColumn: ColumnDef<PermissionIndexType>[] = [
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DialogDeletePermission permission={row.original}>
+                <PermissionDeleteDialog permission={row.original}>
                     <DropdownMenuItem className='focus:text-destructive' onSelect={(e) => e.preventDefault()}>
                         <Icon name='IconTrash' className='me-1.5 stroke-[1.3]' />
                         Delete
                     </DropdownMenuItem>
-                </DialogDeletePermission>
+                </PermissionDeleteDialog>
             </DataTableColumnDropdownAction>
         ),
     },

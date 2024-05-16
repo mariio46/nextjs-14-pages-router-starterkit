@@ -3,7 +3,7 @@ import { Link } from '@/components/link';
 import { Button } from '@/components/ui/button';
 import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 import { PermissionShowType } from '@/types/api/data/permissions';
-import { DialogDeletePermission } from '../dialog-delete-permission';
+import { PermissionDeleteDialog } from '../permission-delete-dialog';
 
 interface PermissionDetailActionProps {
     permission: PermissionShowType;
@@ -21,12 +21,12 @@ export const PermissionDetailAction = ({ permission, status }: PermissionDetailA
                         <Icon name='IconEdit' className='me-1' />
                         Edit
                     </Link>
-                    <DialogDeletePermission permission={permission}>
+                    <PermissionDeleteDialog permission={permission}>
                         <Button variant='destructive' type='button'>
                             <Icon name='IconTrash' className='me-1' />
                             Delete
                         </Button>
-                    </DialogDeletePermission>
+                    </PermissionDeleteDialog>
                 </>
             )}
         </div>

@@ -69,7 +69,7 @@ export const EditRoleForm = ({ role }: EditRoleForm2Props) => {
                     type='submit'
                     //  || form.formState.isSubmitSuccessful
                     disabled={form.formState.isSubmitting || isMutationPending}
-                    aria-label='Login'>
+                    aria-label='Save'>
                     {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
                     {!form.formState.isSubmitting ? 'Save' : 'Saving...'}
                 </Button>

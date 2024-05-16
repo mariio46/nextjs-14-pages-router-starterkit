@@ -62,7 +62,7 @@ export const CreateRoleForm = () => {
                 <Button
                     type='submit'
                     disabled={form.formState.isSubmitting || form.formState.isSubmitSuccessful}
-                    aria-label='Login'>
+                    aria-label='Save'>
                     {form.formState.isSubmitting && <Icon name='IconLoader' className='size-4 me-1 animate-spin' />}
                     {!form.formState.isSubmitting ? 'Save' : 'Saving...'}
                 </Button>

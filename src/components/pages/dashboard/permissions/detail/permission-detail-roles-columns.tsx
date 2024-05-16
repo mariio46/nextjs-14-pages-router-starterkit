@@ -3,7 +3,7 @@ import { BaseRoleType } from '@/types/api/data/roles';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 
-export const permissionDetailRoleColumns: ColumnDef<BaseRoleType>[] = [
+export const permissionDetailRolesColumns: ColumnDef<BaseRoleType>[] = [
     {
         id: '#',
         header: () => <div className='w-0.5 text-start'>#</div>,

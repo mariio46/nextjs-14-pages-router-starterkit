@@ -12,7 +12,7 @@ interface PermissionEditFormProps {
 }
 
 export const PermissionEditForm = ({ permission }: PermissionEditFormProps) => {
-    const { asyncSubmit, form, isMutationPending } = useEditPermission(permission);
+    const { asyncSubmit, form } = useEditPermission(permission);
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(asyncSubmit)} className='space-y-4'>

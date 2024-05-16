@@ -5,12 +5,12 @@ import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSinglePermission } from '@/lib/api/data/permissions/fetch-permissions';
 
+import { FormSkeleton } from '@/components/form-skeleton';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
 import { PermissionEditForm } from '@/components/pages/dashboard/permissions/permission-edit-form';
-import { PermissionFormSkeleton } from '@/components/pages/dashboard/permissions/permission-form-skeleton';
 
 type PermissionEditPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -53,7 +53,11 @@ const PermissionEditPage: NextPageWithLayout<PermissionEditPageProps> = ({ id: p
             />
 
             <section id='edit-permission-form' className='max-w-xl'>
-                {status === 'success' ? <PermissionEditForm permission={permission!} /> : <PermissionFormSkeleton />}
+                {status === 'success' ? (
+                    <PermissionEditForm permission={permission!} />
+                ) : (
+                    <FormSkeleton inputLength={1} />
+                )}
             </section>
         </SecondShell>
     );

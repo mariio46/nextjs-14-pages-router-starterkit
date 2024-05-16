@@ -20,7 +20,7 @@ interface DialogDeletePermissionProps {
     children: React.ReactNode;
 }
 
-export const DialogDeletePermission = ({ children, permission }: DialogDeletePermissionProps) => {
+export const PermissionDeleteDialog = ({ children, permission }: DialogDeletePermissionProps) => {
     const { openDialog, toggleDialog } = useToggleDialog();
     const { handleDelete, isPending } = useDeletePermission(permission, toggleDialog);
 

@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/tanstack/data-table';
 import { PermissionShowType } from '@/types/api/data/permissions';
 import { PermissionDetailCardInfo } from './permission-detail-card-info';
-import { permissionDetailRoleColumns } from './permission-detail-role-columns';
+import { permissionDetailRolesColumns } from './permission-detail-roles-columns';
 import { PermissionDetailSekeleton } from './permission-detail-skeleton';
 
 interface PermissionDetailBlockProps {
@@ -22,7 +22,7 @@ export const PermissionDetailBlock = ({ permission, isError, isLoading, status }
 
             <DataTable
                 data={permission?.roles!}
-                columns={permissionDetailRoleColumns}
+                columns={permissionDetailRolesColumns}
                 status={status}
                 filterKey='name'
             />

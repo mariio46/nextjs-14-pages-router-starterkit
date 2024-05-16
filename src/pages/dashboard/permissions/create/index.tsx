@@ -8,7 +8,7 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { CreatePermissionForm } from '@/components/pages/dashboard/permissions/create-permission-form';
+import { PermissionCreateForm } from '@/components/pages/dashboard/permissions/permission-create-form';
 
 type PermissionCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -44,7 +44,7 @@ const PermissionCreatePage: NextPageWithLayout<PermissionCreatePageProps> = () =
             />
 
             <section id='create-permission-form' className='max-w-xl'>
-                <CreatePermissionForm />
+                <PermissionCreateForm />
             </section>
         </SecondShell>
     );
