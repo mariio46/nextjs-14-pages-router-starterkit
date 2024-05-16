@@ -32,21 +32,25 @@ export const permissionsColumn: ColumnDef<PermissionIndexType>[] = [
                 </div>
             );
         },
+        meta: { displayName: 'Name' },
     },
     {
         accessorKey: 'roles_count',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Total Attached Roles' />,
         cell: ({ row }) => <div>{`${row.getValue('roles_count')} Roles`}</div>,
+        meta: { displayName: 'Total Attached Roles' },
     },
     {
         accessorKey: 'created',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
         cell: ({ row }) => <div>{diffForHumans(row.original.created, true)}</div>,
+        meta: { displayName: 'Created' },
     },
     {
         accessorKey: 'updated',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Updated' />,
         cell: ({ row }) => <div>{diffForHumans(row.original.updated, true)}</div>,
+        meta: { displayName: 'Updated' },
     },
     {
         id: 'actions',
