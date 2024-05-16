@@ -5,11 +5,13 @@ import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSingleRole } from '@/lib/api/data/roles/fetch-roles';
 
+import { FormSkeleton } from '@/components/form-skeleton';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { EditRoleForm } from '@/components/pages/dashboard/roles/edit-role-form';
+import { RoleEditForm } from '@/components/pages/dashboard/roles/role-edit-form';
+import { usePermissionFormData } from '@/lib/api/data/permissions/fetch-permissions';
 
 type RoleEditPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -24,7 +26,8 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 }) satisfies GetServerSideProps<{ id: string }>;
 
 const RoleEditPage: NextPageWithLayout<RoleEditPageProps> = ({ id: roleId }) => {
-    const { role, isLoading, isError } = useFetchSingleRole(roleId);
+    const { role, status: roleStatus } = useFetchSingleRole(roleId);
+    const { formData, status: formDataStatus } = usePermissionFormData();
 
     const breadcrumbData = [
         {
@@ -49,7 +52,11 @@ const RoleEditPage: NextPageWithLayout<RoleEditPageProps> = ({ id: roleId }) => 
             <SecondShell.Header title='Edit Role' description='This action will be update the role you choose.' />
 
             <section id='edit-role-form' className='max-w-xl'>
-                {!isLoading && !isError && <EditRoleForm role={role!} />}
+                {roleStatus !== 'success' || formDataStatus !== 'success' ? (
+                    <FormSkeleton />
+                ) : (
+                    <RoleEditForm formData={formData!} role={role!} />
+                )}
             </section>
         </SecondShell>
     );

@@ -4,14 +4,14 @@ import { PermissionDetailCardInfo } from './permission-detail-card-info';
 import { permissionDetailRolesColumns } from './permission-detail-roles-columns';
 import { PermissionDetailSekeleton } from './permission-detail-skeleton';
 
-interface PermissionDetailBlockProps {
+interface PermissionDetailBlocksProps {
     permission: PermissionShowType;
     isLoading: boolean;
     isError: boolean;
     status: 'pending' | 'error' | 'success';
 }
 
-export const PermissionDetailBlock = ({ permission, isError, isLoading, status }: PermissionDetailBlockProps) => {
+export const PermissionDetailBlocks = ({ permission, isError, isLoading, status }: PermissionDetailBlocksProps) => {
     return (
         <div className='space-y-5'>
             {isLoading || isError ? (

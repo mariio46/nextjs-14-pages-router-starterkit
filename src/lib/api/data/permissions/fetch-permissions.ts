@@ -48,7 +48,7 @@ export const useFetchAllPermissions = (): UseFetchAllPermissionsReturn => {
 };
 
 export const usePermissionFormData = () => {
-    const { permissions } = useFetchAllPermissions();
+    const { permissions, status } = useFetchAllPermissions();
 
     const formData: MultipleSelectOption[] | undefined =
         permissions &&
@@ -59,7 +59,7 @@ export const usePermissionFormData = () => {
             };
         });
 
-    return formData;
+    return { formData, status };
 };
 
 export const useFetchSinglePermission = (id: string) => {

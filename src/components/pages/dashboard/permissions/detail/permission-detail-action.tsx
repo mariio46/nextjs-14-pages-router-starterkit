@@ -1,7 +1,6 @@
 import { Icon } from '@/components/icon';
 import { Link } from '@/components/link';
 import { Button } from '@/components/ui/button';
-import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 import { PermissionShowType } from '@/types/api/data/permissions';
 import { PermissionDeleteDialog } from '../permission-delete-dialog';
 
@@ -11,8 +10,6 @@ interface PermissionDetailActionProps {
 }
 
 export const PermissionDetailAction = ({ permission, status }: PermissionDetailActionProps) => {
-    const { toggleDialog, openDialog } = useToggleDialog();
-
     return (
         <div className='flex items-center gap-2'>
             {status === 'success' && (

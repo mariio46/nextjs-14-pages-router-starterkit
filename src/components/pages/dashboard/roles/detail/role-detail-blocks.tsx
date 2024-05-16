@@ -2,26 +2,26 @@ import { useId } from 'react';
 
 import { RoleShowType } from '@/types/api/data/roles';
 
+import { DataTable } from '@/components/tanstack/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QueryStatus } from '@tanstack/react-query';
 import { RoleDetailCardInfo } from './role-detail-card-info';
-import { RoleDetailDataTable } from './role-detail-data-table';
 import { roleDetailPermissionsColumn } from './role-detail-permissions-columns';
 import { RoleDetailSkeleton } from './role-detail-skeleton';
 import { roleDetailUsersColumn } from './role-detail-users-columns';
 
 interface RolesDetailBlocksProps {
     role: RoleShowType;
-    isLoading: boolean;
-    isError: boolean;
+    status: QueryStatus;
 }
 
-export const RoleDetailBlocks = ({ role, isError, isLoading }: RolesDetailBlocksProps) => {
+export const RoleDetailBlocks = ({ role, status }: RolesDetailBlocksProps) => {
     const _permissionTableKey = useId();
     const _userTableKey = useId();
 
     return (
         <div className='space-y-5'>
-            {isLoading || isError ? <RoleDetailSkeleton /> : <RoleDetailCardInfo role={role} />}
+            {status !== 'success' ? <RoleDetailSkeleton /> : <RoleDetailCardInfo role={role} />}
 
             <Tabs defaultValue='permissions'>
                 <TabsList className='max-w-[300px] w-full'>
@@ -33,25 +33,21 @@ export const RoleDetailBlocks = ({ role, isError, isLoading }: RolesDetailBlocks
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value='permissions'>
-                    <RoleDetailDataTable
-                        key={_permissionTableKey}
-                        columns={roleDetailPermissionsColumn}
+                    <DataTable
                         data={role?.permissions!}
-                        isLoading={isLoading}
-                        isError={isError}
-                        searchPlaceholder='Find permission...'
-                        tableTitle='Permissions'
+                        columns={roleDetailPermissionsColumn}
+                        filterKey='name'
+                        status={status}
+                        key={_permissionTableKey}
                     />
                 </TabsContent>
                 <TabsContent value='users'>
-                    <RoleDetailDataTable
-                        key={_userTableKey}
-                        columns={roleDetailUsersColumn}
+                    <DataTable
                         data={role?.users!}
-                        isLoading={isLoading}
-                        isError={isError}
-                        searchPlaceholder='Find user...'
-                        tableTitle='Users'
+                        columns={roleDetailUsersColumn}
+                        filterKey='name'
+                        status={status}
+                        key={_userTableKey}
                     />
                 </TabsContent>
             </Tabs>

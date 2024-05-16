@@ -4,11 +4,13 @@ import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next'
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 
+import { FormSkeleton } from '@/components/form-skeleton';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { CreateRoleForm } from '@/components/pages/dashboard/roles/create-role-form';
+import { RoleCreateForm } from '@/components/pages/dashboard/roles/role-create-form';
+import { usePermissionFormData } from '@/lib/api/data/permissions/fetch-permissions';
 
 type RoleCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -23,6 +25,8 @@ export const getServerSideProps = (async ({ req, res }) => {
 }) satisfies GetServerSideProps;
 
 const RoleCreatePage: NextPageWithLayout<RoleCreatePageProps> = () => {
+    const { formData, status: formDataStatus } = usePermissionFormData();
+
     const breadcrumbData = [
         {
             as: 'link',
@@ -44,7 +48,7 @@ const RoleCreatePage: NextPageWithLayout<RoleCreatePageProps> = () => {
             />
 
             <div className='max-w-xl'>
-                <CreateRoleForm />
+                {formDataStatus !== 'success' ? <FormSkeleton /> : <RoleCreateForm formData={formData!} />}
             </div>
         </SecondShell>
     );

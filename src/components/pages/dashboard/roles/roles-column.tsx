@@ -1,8 +1,15 @@
-import { diffForHumans } from '@/lib/utils';
-import { RoleIndexType } from '@/types/api/data/roles';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
-import { RolesColumnDropdownAction } from './roles-column-dropdown-action';
+
+import { RoleIndexType } from '@/types/api/data/roles';
+
+import { diffForHumans } from '@/lib/utils';
+
+import { Icon } from '@/components/icon';
+import { DataTableColumnDropdownAction } from '@/components/tanstack/data-table-column-dropdown-action';
+import { DataTableColumnHeader } from '@/components/tanstack/data-table-column-header';
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { RoleDeleteDialog } from './role-delete-dialog';
 
 export const rolesColumn: ColumnDef<RoleIndexType>[] = [
     {
@@ -12,7 +19,7 @@ export const rolesColumn: ColumnDef<RoleIndexType>[] = [
     },
     {
         accessorKey: 'name',
-        header: 'Name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
         cell: ({ row }) => {
             const role = row.original;
             return (
@@ -24,29 +31,60 @@ export const rolesColumn: ColumnDef<RoleIndexType>[] = [
                 </div>
             );
         },
+        meta: { displayName: 'Name' },
     },
     {
         accessorKey: 'permissions_count',
-        header: () => <div className='text-center'>Total Permission</div>,
-        cell: ({ row }) => <div className='text-center'>{`${row.getValue('permissions_count')} Permissions`}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Total Permission' />,
+        cell: ({ row }) => <div>{`${row.getValue('permissions_count')} Permissions`}</div>,
+        meta: { displayName: 'Total Permissions' },
     },
     {
         accessorKey: 'users_count',
-        header: () => <div className='text-center'>Total User</div>,
-        cell: ({ row }) => <div className='text-center'>{`${row.getValue('users_count')} Users`}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Total User' />,
+        cell: ({ row }) => <div>{`${row.getValue('users_count')} Users`}</div>,
+        meta: { displayName: 'Total Users' },
     },
     {
         accessorKey: 'created',
-        header: () => <div className='text-center'>Created</div>,
-        cell: ({ row }) => <div className='text-center'>{diffForHumans(row.original.created, true)}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
+        cell: ({ row }) => <div>{diffForHumans(row.original.created, true)}</div>,
+        meta: { displayName: 'Created' },
     },
     {
         accessorKey: 'updated',
-        header: () => <div className='text-center'>Updated</div>,
-        cell: ({ row }) => <div className='text-center'>{diffForHumans(row.original.updated, true)}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Updated' />,
+        cell: ({ row }) => <div>{diffForHumans(row.original.updated, true)}</div>,
+        meta: { displayName: 'Updated' },
     },
     {
         id: 'actions',
-        cell: ({ row }) => <RolesColumnDropdownAction role={row.original} />,
+        cell: ({ row }) => {
+            const role = row.original;
+
+            return (
+                <DataTableColumnDropdownAction>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/roles/${role.id}`}>
+                            <Icon name='IconEye' className='me-1.5 stroke-[1.3]' />
+                            View
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/roles/${role.id}/edit`}>
+                            <Icon name='IconEdit' className='me-1.5 stroke-[1.3]' />
+                            Edit
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <RoleDeleteDialog role={role}>
+                        <DropdownMenuItem className='focus:text-destructive' onSelect={(e) => e.preventDefault()}>
+                            <Icon name='IconTrash' className='me-1.5 stroke-[1.3]' />
+                            Delete
+                        </DropdownMenuItem>
+                    </RoleDeleteDialog>
+                </DataTableColumnDropdownAction>
+            );
+        },
     },
 ];

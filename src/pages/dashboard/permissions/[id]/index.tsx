@@ -3,14 +3,14 @@ import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next'
 
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { useFetchSinglePermission } from '@/lib/api/data/permissions/fetch-permissions';
 
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
 import { PermissionDetailAction } from '@/components/pages/dashboard/permissions/detail/permission-detail-action';
-import { PermissionDetailBlock } from '@/components/pages/dashboard/permissions/detail/permission-detail-block';
-import { useFetchSinglePermission } from '@/lib/api/data/permissions/fetch-permissions';
+import { PermissionDetailBlocks } from '@/components/pages/dashboard/permissions/detail/permission-detail-blocks';
 
 type PermissionDetailPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -51,7 +51,7 @@ const PermissionDetailPage: NextPageWithLayout<PermissionDetailPageProps> = ({ i
             </SecondShell.HeaderContainer>
 
             <section id='detail-permission'>
-                <PermissionDetailBlock
+                <PermissionDetailBlocks
                     permission={permission!}
                     isError={isError}
                     isLoading={isLoading}

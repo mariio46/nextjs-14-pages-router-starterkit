@@ -10,20 +10,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 import { useDeleteRole } from '@/lib/api/data/roles/delete-role';
 import { RoleIndexType, RoleShowType } from '@/types/api/data/roles';
 
-interface DialogDeleteRoleProps {
+interface RoleDeleteDialogProps {
     role: RoleIndexType | RoleShowType;
     children: React.ReactNode;
-    open: boolean;
-    onOpenChange: () => void;
 }
 
-const DialogDeleteRole: React.FC<DialogDeleteRoleProps> = ({ role, children, open, onOpenChange }) => {
-    const { handleDeleteRole, isPending } = useDeleteRole(onOpenChange, role);
+export const RoleDeleteDialog: React.FC<RoleDeleteDialogProps> = ({ role, children }) => {
+    const { openDialog, toggleDialog } = useToggleDialog();
+    const { handleDeleteRole, isPending } = useDeleteRole(toggleDialog, role);
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+        <Dialog open={openDialog} onOpenChange={toggleDialog} modal={true}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -64,5 +65,3 @@ const DialogDeleteRole: React.FC<DialogDeleteRoleProps> = ({ role, children, ope
         </Dialog>
     );
 };
-
-export { DialogDeleteRole };

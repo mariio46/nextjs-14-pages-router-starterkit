@@ -26,20 +26,21 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                     Visibility
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-[150px]'>
+            <DropdownMenuContent align='end' className='w-full'>
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table
                     .getAllColumns()
                     .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
                     .map((column) => {
+                        const displayName = column.columnDef.meta?.displayName || column.id;
                         return (
                             <DropdownMenuCheckboxItem
                                 key={column.id}
                                 className='capitalize'
                                 checked={column.getIsVisible()}
                                 onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                                {column.id}
+                                {displayName}
                             </DropdownMenuCheckboxItem>
                         );
                     })}

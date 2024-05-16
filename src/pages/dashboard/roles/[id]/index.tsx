@@ -25,7 +25,7 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 }) satisfies GetServerSideProps<{ id: string }>;
 
 const RoleDetailPage: NextPageWithLayout<RoleDetailPageProps> = ({ id: roleId }) => {
-    const { role, isLoading, isError } = useFetchSingleRole(roleId);
+    const { role, status } = useFetchSingleRole(roleId);
 
     const breadcrumbData = [
         {
@@ -51,7 +51,7 @@ const RoleDetailPage: NextPageWithLayout<RoleDetailPageProps> = ({ id: roleId })
             </div>
 
             <section id='detail-role'>
-                <RoleDetailBlocks role={role!} isLoading={isLoading} isError={isError} />
+                <RoleDetailBlocks role={role!} status={status} />
             </section>
         </SecondShell>
     );

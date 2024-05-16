@@ -1,6 +1,6 @@
 import { RoleShowType } from '@/types/api/data/roles';
 
-import { capitalize } from '@/lib/utils';
+import { capitalize, diffForHumans } from '@/lib/utils';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -29,18 +29,18 @@ export const RoleDetailCardInfo = ({ role }: RoleDetailCardInfoProps) => {
             </Card>
             <Card>
                 <CardHeader className='flex-row items-center justify-between space-y-0 pb-2'>
-                    <CardTitle>Total Permissions</CardTitle>
+                    <CardTitle>Created</CardTitle>
                 </CardHeader>
                 <CardContent className='flex flex-col'>
-                    <p className=' text-sm text-muted-foreground line-clamp-2'>{`${role.permissions?.length} Permissions`}</p>
+                    <p className=' text-sm text-muted-foreground line-clamp-2'>{diffForHumans(role.created, true)}</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className='flex-row items-center justify-between space-y-0 pb-2'>
-                    <CardTitle>Total Users</CardTitle>
+                    <CardTitle>Updated</CardTitle>
                 </CardHeader>
                 <CardContent className='flex flex-col'>
-                    <p className='text-sm text-muted-foreground line-clamp-2'>{`${role.users?.length} Users`}</p>
+                    <p className='text-sm text-muted-foreground line-clamp-2'>{diffForHumans(role.updated, true)}</p>
                 </CardContent>
             </Card>
         </div>

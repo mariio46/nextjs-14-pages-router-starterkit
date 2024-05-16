@@ -1,3 +1,4 @@
+import { DataTableColumnHeader } from '@/components/tanstack/data-table-column-header';
 import { diffForHumans } from '@/lib/utils';
 import { RoleShowUserType } from '@/types/api/data/roles';
 import { ColumnDef } from '@tanstack/react-table';
@@ -11,7 +12,7 @@ export const roleDetailUsersColumn: ColumnDef<RoleShowUserType>[] = [
     },
     {
         accessorKey: 'name',
-        header: 'User',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
         cell: ({ row }) => {
             const user = row.original;
             return (
@@ -26,12 +27,12 @@ export const roleDetailUsersColumn: ColumnDef<RoleShowUserType>[] = [
     },
     {
         accessorKey: 'created',
-        header: () => <div className='text-center'>Created</div>,
-        cell: ({ row }) => <div className='text-center'>{diffForHumans(row.original.created, true)}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
+        cell: ({ row }) => <div>{diffForHumans(row.original.created, true)}</div>,
     },
     {
         accessorKey: 'updated',
-        header: () => <div className='text-center'>Updated</div>,
-        cell: ({ row }) => <div className='text-center'>{diffForHumans(row.original.updated, true)}</div>,
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Updated' />,
+        cell: ({ row }) => <div>{diffForHumans(row.original.updated, true)}</div>,
     },
 ];
