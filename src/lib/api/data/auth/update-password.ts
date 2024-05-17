@@ -49,12 +49,17 @@ const updatePasswordFormSchema = z
         message: 'Current password cannot be same with new password',
         path: ['password'],
     });
+
 type UpdatePasswordFormFields = z.infer<typeof updatePasswordFormSchema>;
 
 const useUpdatePasswordHandler = (form: UseFormReturn<UpdatePasswordFormFields>) => {
     const router = useRouter();
+
     const { mutate } = useSWRConfig();
+
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const setAuthUser = useAuthUserState((state) => state.setUser);
+
     const { toast } = useToast();
 
     const handleSuccess = (data: UpdatePasswordResponse) => {
@@ -63,6 +68,7 @@ const useUpdatePasswordHandler = (form: UseFormReturn<UpdatePasswordFormFields>)
         deleteCookie(TOKEN_COOKIE_KEY);
 
         setAuthCheck(false);
+        setAuthUser(undefined);
 
         mutate('/user', undefined);
 
@@ -111,10 +117,8 @@ export const useUpdatePassword = () => {
         try {
             // prettier-ignore
             const { data } = await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
-            console.log({ data });
             handleSuccess(data);
         } catch (error) {
-            console.log({ error });
             handleError(error as UpdatePasswordErrorResponse);
         }
     };
