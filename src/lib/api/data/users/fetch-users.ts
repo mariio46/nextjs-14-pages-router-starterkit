@@ -21,6 +21,13 @@ export const useFetchAllUsers = () => {
         queryFn: getAllUsers,
     });
 
+    if (isError) {
+        console.log({ error_fetch_all_users: error });
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(error.message);
+        }
+    }
+
     return { users: data?.data.users, isLoading, isError, error, status };
 };
 
@@ -29,6 +36,13 @@ export const useFetchSingleUser = (username: string) => {
         queryKey: [FETCH_ALL_USERS_KEY, { username: username }],
         queryFn: () => getSingleUser(username),
     });
+
+    if (isError) {
+        console.log({ error_fetch_single_user: error });
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(error.message);
+        }
+    }
 
     return { user: data?.data.user, isLoading, isError, error, status };
 };
