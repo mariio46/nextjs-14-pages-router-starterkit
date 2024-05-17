@@ -1,10 +1,11 @@
+import { useDeleteAccount } from '@/lib/api/data/auth/delete-account';
+
 import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useDeleteAccount } from '@/lib/api/data/auth/delete-account';
 
-export const FormDeleteAccount = ({ closeDialog }: { closeDialog: () => void }) => {
+export const DeleteAccountForm = ({ closeDialog }: { closeDialog: () => void }) => {
     const { submit, form, disabled } = useDeleteAccount(closeDialog);
 
     return (

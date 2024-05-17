@@ -1,20 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
+import { UseFormReturn, useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
-
+import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
+import type { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 import { BE_DELETE_ACCOUNT } from '../../end-point';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
-import { useToast } from '@/components/ui/use-toast';
+type DeleteAccountResponse = ApiResponse<null>;
+
+type DeleteAccountErrorResponse = AxiosError<ApiValidationErrorResponse<{ password?: string[] }>>;
 
 const deleteAccountFormSchema = z.object({
     password: z.string().min(1, { message: 'Password is required.' }),
@@ -22,54 +24,41 @@ const deleteAccountFormSchema = z.object({
 
 type DeleteAccountFormFields = z.infer<typeof deleteAccountFormSchema>;
 
-type DeleteAccountErrorResponse = ApiValidationErrorResponse<{ password?: string[] }>;
+const useDeleteAccountHandler = (form: UseFormReturn<DeleteAccountFormFields>, closeDialog: () => void) => {
+    const router = useRouter();
 
-export const useDeleteAccount = (closeDialog: () => void) => {
-    const setAuthCheck = useAuthUserState((state) => state.setCheck);
     const { mutate } = useSWRConfig();
 
-    const router = useRouter();
+    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const setAuthUser = useAuthUserState((state) => state.setUser);
+
     const { toast } = useToast();
 
-    const form = useForm<DeleteAccountFormFields>({
-        resolver: zodResolver(deleteAccountFormSchema),
-        defaultValues: {
-            password: '',
-        },
-    });
-
-    // prettier-ignore
-    const disabled: boolean = !form.formState.isDirty ||form.formState.isSubmitting || form.formState.isSubmitSuccessful;
-
-    // prettier-ignore
-    const submit = async (values: DeleteAccountFormFields) => {
-        await axios.post<ApiResponse<null>>(BE_DELETE_ACCOUNT, values, getClientSideAxiosHeaders())
-            .then((response) => handleWhenDeletingAccountIsSuccess(response.data))
-            .catch((e: AxiosError<DeleteAccountErrorResponse>) => handleWhenDeletingAccountIsFailed(e))
-    };
-
-    const handleWhenDeletingAccountIsSuccess = (data: ApiResponse<null>): void => {
+    const handleSuccess = (data: DeleteAccountResponse) => {
         closeDialog();
-
-        toast({
-            title: 'Success',
-            description: data.message,
-        });
 
         deleteCookie(TOKEN_COOKIE_KEY);
 
         setAuthCheck(false);
+        setAuthUser(undefined);
 
         mutate('/user', undefined);
 
-        router.push('/');
+        toast({
+            title: 'Success',
+            description: 'Your account has deleted successfully. Goodbye👋',
+            duration: 10000,
+        });
+
+        router.replace('/');
     };
 
-    const handleWhenDeletingAccountIsFailed = (e: AxiosError<DeleteAccountErrorResponse>): void => {
+    const handleError = (e: DeleteAccountErrorResponse) => {
         if (e.response?.data.errors) {
             const error = e.response.data.errors;
             error?.password && form.setError('password', { message: error?.password[0] }, { shouldFocus: true });
         } else {
+            closeDialog();
             console.error(e);
             toast({
                 title: 'Failed!',
@@ -80,5 +69,31 @@ export const useDeleteAccount = (closeDialog: () => void) => {
         }
     };
 
-    return { submit, form, disabled };
+    return { handleError, handleSuccess };
+};
+
+export const useDeleteAccount = (closeDialog: () => void) => {
+    const form = useForm<DeleteAccountFormFields>({
+        resolver: zodResolver(deleteAccountFormSchema),
+        defaultValues: {
+            password: '',
+        },
+    });
+
+    const { handleError, handleSuccess } = useDeleteAccountHandler(form, closeDialog);
+
+    const submit = async (values: DeleteAccountFormFields) => {
+        try {
+            // prettier-ignore
+            const { data } = await axios.post<DeleteAccountResponse>(BE_DELETE_ACCOUNT, values, getClientSideAxiosHeaders())
+            handleSuccess(data);
+        } catch (error) {
+            handleError(error as DeleteAccountErrorResponse);
+        }
+    };
+
+    // prettier-ignore
+    const disabled: boolean = !form.formState.isDirty || form.formState.isSubmitting || form.formState.isSubmitSuccessful;
+
+    return { form, submit, disabled };
 };
