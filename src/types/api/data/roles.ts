@@ -34,6 +34,6 @@ export interface RoleShowType extends BaseRoleType {
     permissions?: RoleShowPermissionType[];
 }
 
-export type FetchSingleRoleResponse = ApiResponse<RoleShowType>;
+export type FetchSingleRoleResponse = ApiResponse<{ role: RoleShowType }>;
 
 export type FetchAllRolesResponse = ApiResponse<{ roles: RoleIndexType[] }>;

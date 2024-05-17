@@ -42,5 +42,5 @@ export const useFetchSingleRole = (id: string) => {
         }
     }
 
-    return { role: data?.data, isLoading, isError, status };
+    return { role: data?.data.role, isLoading, isError, status };
 };
