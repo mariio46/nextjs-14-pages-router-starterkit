@@ -1,5 +1,6 @@
+import { Error } from '@/components/error';
 import { Loading } from '@/components/loading';
-import { useFetchAuthUserData } from '@/lib/api/data/auth/fetch-auth-user-data';
+import { useAuth } from '@/lib/api/data/auth/use-auth';
 import '@/styles/globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -21,16 +22,18 @@ type AppPropsWithLayout = AppProps & {
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            // 5 minute * 60 seconds * 1000 milliseconds
+            // 5 minute * 60 seconds * 1000 milliseconds = 5 minutes
             staleTime: 5 * 60 * 1000,
+            gcTime: 5 * 60 * 1000,
         },
     },
 });
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-    const { validating } = useFetchAuthUserData();
+    const { isLoading, isServerDown, serverDownStatus, serverDownMessage } = useAuth();
 
-    if (!validating) return <Loading />;
+    if (isLoading) return <Loading />;
+    if (isServerDown) return <Error code={serverDownStatus!} message={serverDownMessage!} />;
 
     const getLayout = Component.getLayout || ((page) => page);
 

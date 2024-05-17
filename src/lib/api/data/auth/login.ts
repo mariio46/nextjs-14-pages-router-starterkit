@@ -1,27 +1,32 @@
-import { useToast } from '@/components/ui/use-toast';
-import axios from '@/lib/axios';
-import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api-response';
-import { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
+
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+import { User } from '@/types/user';
+
+import axios from '@/lib/axios';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import { BE_LOGIN } from '../../end-point';
 import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY } from '../../key';
 
-interface LoginFormResponse extends ApiResponse {
-    data: {
-        user: User;
-        access_token: {
-            token: string;
-            expires_at: string;
-        };
+import { useToast } from '@/components/ui/use-toast';
+
+interface DataLoginFormResponse {
+    user: User;
+    access_token: {
+        token: string;
+        expires_at: string;
     };
 }
+
+type LoginFormResponse = ApiResponse<DataLoginFormResponse>;
+
+type LoginErrorResponse = ApiValidationErrorResponse<{ email?: string[]; password?: string[] }>;
 
 const loginFormSchema = z.object({
     email: z.string().email(),
@@ -31,13 +36,12 @@ const loginFormSchema = z.object({
 type LoginFormType = z.infer<typeof loginFormSchema>;
 
 export const useLogin = () => {
-    const { toast } = useToast();
-
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
     const setAuthUser = useAuthUserState((state) => state.setUser);
-    const isValidating = useAuthUserState((state) => state.isValidating);
 
     const router = useRouter();
+    const { mutate } = useSWRConfig();
+    const { toast } = useToast();
 
     const form = useForm<LoginFormType>({
         resolver: zodResolver(loginFormSchema),
@@ -45,20 +49,13 @@ export const useLogin = () => {
     });
 
     const submit = async (values: LoginFormType) => {
-        try {
-            const { data }: AxiosResponse<LoginFormResponse> = await axios.post(BE_LOGIN, values);
-            handleWhenLoginSuccess(data);
-        } catch (e: any) {
-            const error: { email?: string[]; password?: string[] } = e.response?.data?.errors;
-            // prettier-ignore
-            handleAxiosError(e, toast, {
-                error_email: error?.email && form.setError('email', { message: error?.email[0] }, { shouldFocus: true }),
-                error_password: error?.password && form.setError('password', { message: error?.password[0] }),
-            });
-        }
+        await axios
+            .post<LoginFormResponse>(BE_LOGIN, values)
+            .then((response) => handleWhenLoginSuccess(response.data))
+            .catch((e: AxiosError<LoginErrorResponse>) => handleWhenLoginFailed(e));
     };
 
-    const handleWhenLoginSuccess = (data: LoginFormResponse) => {
+    const handleWhenLoginSuccess = (data: LoginFormResponse): void => {
         toast({
             title: 'Success',
             description: data.message,
@@ -89,10 +86,27 @@ export const useLogin = () => {
 
         // trigger useEffect in _app.tsx to update auth user state once again
         setAuthCheck(true);
-        isValidating(false);
+
+        mutate('/user', data.data.user);
 
         // reload for trigger the middleware
         router.push(!router.query.callback ? '/dashboard' : `${router.query.callback?.toString()}`);
+    };
+
+    const handleWhenLoginFailed = (e: AxiosError<LoginErrorResponse>): void => {
+        if (e.response?.data.errors) {
+            const error = e.response.data.errors;
+            error.email && form.setError('email', { message: error.email[0] }, { shouldFocus: true });
+            error.password && form.setError('password', { message: error.password[0] });
+        } else {
+            console.error(e);
+            toast({
+                title: 'Failed!',
+                description: e.message,
+                variant: 'destructive',
+                duration: 10000,
+            });
+        }
     };
 
     return { submit, form };

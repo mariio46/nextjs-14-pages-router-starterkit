@@ -1,3 +1,14 @@
+export type Role = {
+    id: number;
+    name: string;
+};
+
+export type Permissions = {
+    permissions: string[];
+};
+
+export type RolePermission = Role & Permissions;
+
 export type User = {
     id: number;
     name: string;
@@ -8,6 +19,7 @@ export type User = {
     avatar: string;
     created_at: string;
     updated_at: string;
+    role: RolePermission;
 };
 
 export type AuthUserType = {

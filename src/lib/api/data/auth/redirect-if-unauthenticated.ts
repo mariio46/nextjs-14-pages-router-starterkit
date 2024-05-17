@@ -1,16 +1,17 @@
-import { BE_CHECK_TOKEN } from '@/lib/api/end-point';
-import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY, TOKEN_DELETED_VALUE } from '@/lib/api/key';
-import axios from '@/lib/axios';
-import { getServerSideAxiosHeaders } from '@/lib/cookies-next';
-import type { ApiResponse } from '@/types/api-response';
 import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
 import { type IncomingMessage, type ServerResponse } from 'http';
 import { type Redirect } from 'next';
 import { type NextApiRequestCookies } from 'next/dist/server/api-utils';
 
+import { BE_CHECK_TOKEN } from '@/lib/api/end-point';
+import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY, TOKEN_DELETED_VALUE } from '@/lib/api/key';
+import axios from '@/lib/axios';
+import { getServerSideAxiosHeaders } from '@/lib/cookies-next';
+import type { ApiResponse } from '@/types/api/response';
+
 type RequestProps = IncomingMessage & { cookies: NextApiRequestCookies };
 type ResponseProps = ServerResponse;
-type AuthUserTokenResponse = ApiResponse & { data: string };
+type AuthUserTokenResponse = ApiResponse<string>;
 type AuthUserTokenReturn = { authenticated: boolean };
 
 export const authUserTokenValidation = async (req: RequestProps, res: ResponseProps): Promise<AuthUserTokenReturn> => {

@@ -1,62 +1,53 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
+import { type NextPageWithLayout } from '@/pages/_app';
+import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next';
+
+import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
-import { CreateUserForm } from '@/components/pages/dashboard/users/create-form';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
-import { NextPageWithLayout } from '@/pages/_app';
-import { GetServerSideProps } from 'next';
-import Link from 'next/link';
+import { SecondShell } from '@/components/layouts/shells/second-shell';
+import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
+import { UserCreateForm } from '@/components/pages/dashboard/users/user-create-form';
+
+type UserCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
+    const permission_status = await useCheckPermission('management users', { req, res });
 
-    if (!token_status.authenticated) {
-        return RedirectIfUnauthencated;
-    }
+    if (!token_status.authenticated) return RedirectIfUnauthencated;
+    if (!permission_status.authorized) return RedirectIfUnauthorized;
 
     return { props: {} };
 }) satisfies GetServerSideProps;
 
-const Create: NextPageWithLayout = () => {
+const UserCreatePage: NextPageWithLayout<UserCreatePageProps> = () => {
+    const breadcrumbData = [
+        {
+            as: 'link',
+            link: '/users',
+            title: 'Users',
+        },
+        {
+            as: 'page',
+            title: 'Create User',
+        },
+    ] satisfies BreadcrumbDataType[];
+
     return (
-        <>
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link href='/users'>Users</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Create User</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+        <SecondShell>
+            <ShellBreadcrumb data={breadcrumbData} />
+            <SecondShell.Header title='Create New User' description='Fill all the field below to add one user.' />
 
-            <HeaderPrimary className='my-5 space-y-0.5'>
-                <HeaderPrimaryTitle className='text-base'>Create User</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>Fill all the field below to add one user.</HeaderPrimaryDescription>
-            </HeaderPrimary>
-
-            <section id='create-user-form'>
-                <div className='max-w-xl'>
-                    <CreateUserForm />
-                </div>
+            <section id='create-user-form' className='max-w-xl'>
+                <UserCreateForm />
             </section>
-        </>
+        </SecondShell>
     );
 };
 
-Create.getLayout = function getLayout(page: React.ReactElement) {
+UserCreatePage.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
             <AuthLayout title='Create User'>{page}</AuthLayout>
@@ -64,4 +55,4 @@ Create.getLayout = function getLayout(page: React.ReactElement) {
     );
 };
 
-export default Create;
+export default UserCreatePage;

@@ -1,21 +1,24 @@
-import { useToast } from '@/components/ui/use-toast';
-import axios from '@/lib/axios';
-import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
-import { handleAxiosError } from '@/lib/utilities/axios-utils';
-import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse } from '@/types/api-response';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
+
+import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+
+import axios from '@/lib/axios';
+import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
+import { useAuthUserState } from '@/services/store/auth-user-state';
 import { BE_UPDATE_PASSWORD } from '../../end-point';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
-interface UpdatePasswordResponse extends ApiResponse {
-    data: null;
-}
+import { useToast } from '@/components/ui/use-toast';
+
+type UpdatePasswordResponse = ApiResponse<null>;
+
+type UpdatePasswordErrorResponse = ApiValidationErrorResponse<{ current_password?: string[]; password?: string[] }>;
 
 // prettier-ignore
 const updatePasswordFormSchema = z.object({
@@ -40,7 +43,8 @@ type UpdatePasswordFormFields = z.infer<typeof updatePasswordFormSchema>;
 
 export const useUpdatePassword = () => {
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
-    const isValidating = useAuthUserState((state) => state.isValidating);
+
+    const { mutate } = useSWRConfig();
 
     const router = useRouter();
     const { toast } = useToast();
@@ -57,24 +61,11 @@ export const useUpdatePassword = () => {
     // prettier-ignore
     const disabled: boolean = !form.formState.isDirty || form.formState.isSubmitting || form.formState.isSubmitSuccessful;
 
+    // prettier-ignore
     const submit = async (values: UpdatePasswordFormFields): Promise<void> => {
-        try {
-            // prettier-ignore
-            const response: AxiosResponse<UpdatePasswordResponse> = await axios.post(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
-
-            if (response.status === 200 && response.data.code === 200) {
-                handleWhenUpdatingPasswordIsSuccess(response.data);
-            } else {
-                console.log(response);
-            }
-        } catch (e: any) {
-            const error: { current_password?: string[]; password?: string[] } = e.response?.data.errors;
-            // prettier-ignore
-            handleAxiosError(e,toast, {
-                error_current_password: error?.current_password && form.setError('current_password', { message: error?.current_password[0] }),
-                error_password: error?.password && form.setError('password', { message: error?.password[0] }),
-            });
-        }
+        await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
+            .then((response) => handleWhenUpdatingPasswordIsSuccess(response.data))
+            .catch((e: AxiosError<UpdatePasswordErrorResponse>) => handleWhenUpdatingPasswordIsFailed(e));
     };
 
     const handleWhenUpdatingPasswordIsSuccess = (data: UpdatePasswordResponse): void => {
@@ -88,8 +79,26 @@ export const useUpdatePassword = () => {
         deleteCookie(TOKEN_COOKIE_KEY);
 
         setAuthCheck(false);
-        isValidating(false);
-        router.push('/');
+
+        mutate('/user', undefined);
+
+        router.replace('/login?callback=/settings');
+    };
+
+    const handleWhenUpdatingPasswordIsFailed = (e: AxiosError<UpdatePasswordErrorResponse>): void => {
+        if (e.response?.data.errors) {
+            const error = e.response.data.errors;
+            error?.current_password && form.setError('current_password', { message: error.current_password[0] });
+            error?.password && form.setError('password', { message: error.password[0] });
+        } else {
+            console.error(e);
+            toast({
+                title: 'Failed!',
+                description: e.message,
+                variant: 'destructive',
+                duration: 10000,
+            });
+        }
     };
 
     return { submit, form, disabled };

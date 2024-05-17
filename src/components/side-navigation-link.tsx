@@ -1,7 +1,13 @@
 import { cn } from '@/lib/utils';
-import type { NavigationProps } from '@/types/components';
-import Link from 'next/link';
+import { type Route } from 'next';
+import Link, { LinkProps } from 'next/link';
 import { useRouter } from 'next/router';
+
+interface NavigationProps extends LinkProps {
+    href: Route | URL;
+    className?: string;
+    children: React.ReactNode;
+}
 
 type SideNavigationLinkProps = NavigationProps;
 

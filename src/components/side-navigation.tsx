@@ -1,3 +1,4 @@
+import { useHasPermission } from '@/lib/utilities/role-permission-utils';
 import { Icon } from './icon';
 import { SideNavigationLink } from './side-navigation-link';
 
@@ -14,10 +15,24 @@ export const SideNavigation = () => {
                         <Icon name='IconSettings' />
                         Settings
                     </SideNavigationLink>
-                    <SideNavigationLink href='/users'>
-                        <Icon name='IconUsersGroup' />
-                        Users
-                    </SideNavigationLink>
+                    {useHasPermission('management users') && (
+                        <SideNavigationLink href='/users'>
+                            <Icon name='IconUsersGroup' />
+                            Users
+                        </SideNavigationLink>
+                    )}
+                    {useHasPermission('management role permission') && (
+                        <>
+                            <SideNavigationLink href='/roles'>
+                                <Icon name='IconSpy' />
+                                Roles
+                            </SideNavigationLink>
+                            <SideNavigationLink href='/permissions'>
+                                <Icon name='IconLicense' />
+                                Permissions
+                            </SideNavigationLink>
+                        </>
+                    )}
                 </ul>
             </div>
         </aside>

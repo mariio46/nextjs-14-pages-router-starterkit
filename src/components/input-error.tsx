@@ -1,14 +1,19 @@
+import * as React from 'react';
+
 import { cn } from '@/lib/utils';
-import React from 'react';
 
 interface InputErrorType extends React.HTMLAttributes<HTMLParagraphElement> {
     message?: string;
 }
 
-export const InputError: React.FC<InputErrorType> = ({ message, className, ...props }) => {
+const InputError = React.forwardRef<HTMLParagraphElement, InputErrorType>(({ message, className, ...props }, ref) => {
     return message ? (
-        <p className={cn('text-sm text-red-600', className)} {...props}>
+        <p className={cn('text-sm text-red-600 mt-1', className)} ref={ref} {...props}>
             {message}
         </p>
     ) : null;
-};
+});
+
+InputError.displayName = 'InputError';
+
+export { InputError };

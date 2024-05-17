@@ -1,19 +1,13 @@
-import { HeaderPrimary, HeaderPrimaryDescription, HeaderPrimaryTitle } from '@/components/header';
-import { AuthLayout } from '@/components/layouts/auth-layout';
-import { RootLayout } from '@/components/layouts/root-layout';
-import { UpdatePasswordForm } from '@/components/pages/dashboard/settings/security/form';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { type NextPageWithLayout } from '@/pages/_app';
 import { type GetServerSideProps } from 'next';
-import Link from 'next/link';
+
+import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+
+import { AuthLayout } from '@/components/layouts/auth-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
+import { SecondShell } from '@/components/layouts/shells/second-shell';
+import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
+import { UpdatePasswordForm } from '@/components/pages/dashboard/settings/security/form';
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
@@ -26,38 +20,29 @@ export const getServerSideProps = (async ({ req, res }) => {
 }) satisfies GetServerSideProps;
 
 const Security: NextPageWithLayout = () => {
+    const data = [
+        {
+            as: 'link',
+            link: '/settings',
+            title: 'Settings',
+        },
+        {
+            as: 'page',
+            title: 'Security',
+        },
+    ] satisfies BreadcrumbDataType[];
+
     return (
-        <>
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link href='/settings'>Settings</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Security</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+        <SecondShell>
+            <ShellBreadcrumb data={data} />
+            <SecondShell.Header title='Security' description='Use a strong and random password for better security.' />
 
-            <HeaderPrimary className='my-5 space-y-0.5'>
-                <HeaderPrimaryTitle className='text-base'>Security</HeaderPrimaryTitle>
-                <HeaderPrimaryDescription>
-                    Use a strong and random password for better security.
-                    <span className='font-bold'>You&apos;ll be logged out after changing your password.</span>
-                </HeaderPrimaryDescription>
-            </HeaderPrimary>
-
-            <section id='update-account-form'>
-                <div className='mx-auto max-w-7xl'>
-                    <div className='max-w-xl'>
-                        <UpdatePasswordForm />
-                    </div>
+            <section id='update-password-form'>
+                <div className='max-w-xl'>
+                    <UpdatePasswordForm />
                 </div>
             </section>
-        </>
+        </SecondShell>
     );
 };
 

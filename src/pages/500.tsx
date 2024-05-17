@@ -1,4 +1,4 @@
-export default function Custom404() {
+export default function Custom500() {
     return (
         <div className='flex min-h-screen items-center justify-center bg-background'>
             <main className='mx-auto w-full max-w-7xl px-6 pb-16 pt-10 sm:pb-24 lg:px-8'>
