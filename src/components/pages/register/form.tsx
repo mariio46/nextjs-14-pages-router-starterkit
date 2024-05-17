@@ -1,10 +1,10 @@
+import { useRegister } from '@/lib/api/data/auth/register';
+
 import { Icon } from '@/components/icon';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Link } from '@/components/link';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useRegister } from '@/lib/api/data/auth/register';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
 export const RegisterForm = () => {
     const { submit, form } = useRegister();
@@ -94,7 +94,7 @@ export const RegisterForm = () => {
                     )}
                 />
                 <div className='flex justify-end gap-4'>
-                    <Link href='/login' className={cn(buttonVariants({ variant: 'ghost' }))}>
+                    <Link href='/login' variant='ghost'>
                         Already have an account
                     </Link>
                     <Button

@@ -4,7 +4,10 @@ import { NextResponse } from 'next/server';
 import { TOKEN_COOKIE_KEY, TOKEN_DELETED_KEY } from './lib/api/key';
 
 export function middleware(request: NextRequest) {
-    console.log('Middleware Triggered');
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('Middleware Triggered');
+    }
+
     const response = NextResponse;
 
     const cookies_next_option = { req: request, res: response.next() };
@@ -37,17 +40,6 @@ export function middleware(request: NextRequest) {
  * This routes just for authenticated user / cookies has 'auth-api-token' as TOKEN_COOKIE_KEY
  */
 export const config = {
-    // matcher: [
-    //     '/dashboard',
-    //     '/settings',
-    //     '/settings/account',
-    //     '/settings/security',
-    //     '/settings/danger',
-    //     '/users',
-    //     '/users/create',
-    //     '/login',
-    //     '/register',
-    // ],
     matcher: [
         '/dashboard',
         '/settings/:path*',

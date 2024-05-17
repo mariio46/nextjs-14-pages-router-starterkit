@@ -1,66 +1,52 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type AxiosError } from 'axios';
+import { deleteCookie, hasCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
-
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 
 import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
+import type { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 import { BE_REGISTER } from '../../end-point';
+import { TOKEN_DELETED_KEY } from '../../key';
 
 type RegisterFormResponse = ApiResponse<string>;
 
-type RegisterErrorResponse = ApiValidationErrorResponse<{ name: string[]; email: string[]; password: string[] }>;
+type RegisterErrorResponse = AxiosError<
+    ApiValidationErrorResponse<{ name: string[]; email: string[]; password: string[] }>
+>;
 
-// prettier-ignore
-const registerFormSchema = z.object({
-    name: z.string().min(3),
-    email: z.string().email(),
-    password: z.string().min(8),
-    password_confirmation: z.string().min(8),
-}).refine((data) => data.password === data.password_confirmation, {
-    message: "Password doesn't match.",
-    path: ['password_confirmation'],
-});
+const registerFormSchema = z
+    .object({
+        name: z.string().min(3),
+        email: z.string().email(),
+        password: z.string().min(8),
+        password_confirmation: z.string().min(8),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+        message: "Password doesn't match.",
+        path: ['password_confirmation'],
+    });
 
 type RegisterFormFields = z.infer<typeof registerFormSchema>;
 
-export const useRegister = () => {
+const useRegsiterHandler = (form: UseFormReturn<RegisterFormFields>) => {
     const router = useRouter();
     const { toast } = useToast();
 
-    const form = useForm<RegisterFormFields>({
-        resolver: zodResolver(registerFormSchema),
-        defaultValues: {
-            name: '',
-            email: '',
-            password: '',
-            password_confirmation: '',
-        },
-    });
+    const handleSuccess = (data: RegisterFormResponse) => {
+        form.reset();
 
-    // prettier-ignore
-    const submit = async (values: RegisterFormFields) => {
-        await axios.post<RegisterFormResponse>(BE_REGISTER, values)
-            .then((response) => handleWhenRegisterSuccess(response.data))
-            .catch((e: AxiosError<RegisterErrorResponse>) => handleWhenRegisterFailed(e))
-    };
-
-    const handleWhenRegisterSuccess = (data: RegisterFormResponse): void => {
         toast({
             title: 'Success',
             description: data.data,
-            duration: 2000,
         });
-
-        form.reset();
 
         router.push('/login');
     };
 
-    const handleWhenRegisterFailed = (e: AxiosError<RegisterErrorResponse>): void => {
+    const handleError = (e: RegisterErrorResponse) => {
         if (e.response?.data.errors) {
             const error = e.response.data.errors;
             error.name && form.setError('name', { message: error.name[0] });
@@ -74,6 +60,35 @@ export const useRegister = () => {
                 variant: 'destructive',
                 duration: 10000,
             });
+        }
+    };
+
+    return { handleError, handleSuccess };
+};
+
+export const useRegister = () => {
+    const form = useForm<RegisterFormFields>({
+        resolver: zodResolver(registerFormSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            password: '',
+            password_confirmation: '',
+        },
+    });
+
+    const { handleError, handleSuccess } = useRegsiterHandler(form);
+
+    const submit = async (values: RegisterFormFields) => {
+        if (hasCookie(TOKEN_DELETED_KEY)) {
+            deleteCookie(TOKEN_DELETED_KEY);
+        }
+
+        try {
+            const { data } = await axios.post<RegisterFormResponse>(BE_REGISTER, values);
+            handleSuccess(data);
+        } catch (error) {
+            handleError(error as RegisterErrorResponse);
         }
     };
 

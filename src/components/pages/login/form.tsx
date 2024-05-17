@@ -1,10 +1,10 @@
+import { useLogin } from '@/lib/api/data/auth/login';
+
 import { Icon } from '@/components/icon';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Link } from '@/components/link';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useLogin } from '@/lib/api/data/auth/login';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
 export const LoginForm = () => {
     const { submit, form } = useLogin();
@@ -54,7 +54,7 @@ export const LoginForm = () => {
                     )}
                 />
                 <div className='flex justify-end gap-4'>
-                    <Link href='/register' className={cn(buttonVariants({ variant: 'ghost' }))}>
+                    <Link href='/register' variant='ghost'>
                         Register
                     </Link>
                     <Button
