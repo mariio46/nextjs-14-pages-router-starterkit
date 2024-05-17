@@ -1,14 +1,10 @@
-import { Counter } from '@/components/counter';
-import { AppLayout } from '@/components/layouts/app-layout';
-import { RootLayout } from '@/components/layouts/root-layout';
 import { type NextPageWithLayout } from '../_app';
 
+import { AppLayout } from '@/components/layouts/app-layout';
+import { RootLayout } from '@/components/layouts/root-layout';
+
 const Home: NextPageWithLayout = () => {
-    return (
-        <div className='flex items-center gap-6 justify-center'>
-            <Counter />
-        </div>
-    );
+    return <div className='flex h-full items-center gap-6 justify-center'></div>;
 };
 
 Home.getLayout = function getLayout(page: React.ReactElement) {
