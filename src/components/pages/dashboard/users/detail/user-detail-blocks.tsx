@@ -1,10 +1,10 @@
-import { cn } from '@/lib/utils';
-import { SingleUserType } from '@/types/api/data/users';
+import { cn, now } from '@/lib/utils';
+import { UserShowType } from '@/types/api/data/users';
 import Image from 'next/image';
 import React from 'react';
 
 interface UserDetailBlocksProps {
-    user: SingleUserType;
+    user: UserShowType;
 }
 
 export const UserDetailBlocks: React.FC<UserDetailBlocksProps> = ({ user }) => {
@@ -29,21 +29,25 @@ export const UserDetailBlocks: React.FC<UserDetailBlocksProps> = ({ user }) => {
                     </div>
                     <div>
                         <BlockLabel>Verified at</BlockLabel>
-                        <BlockParagraph>{user.verified}</BlockParagraph>
+                        <BlockParagraph>{user.verified ? now(user.verified) : 'Not verified'}</BlockParagraph>
                     </div>
                 </div>
                 <div>
                     <div>
                         <BlockLabel>Joined</BlockLabel>
-                        <BlockParagraph>{user.joined}</BlockParagraph>
+                        <BlockParagraph>{now(user.joined)}</BlockParagraph>
                     </div>
                     <div>
                         <BlockLabel>Last Updated Account</BlockLabel>
-                        <BlockParagraph>{user.last_updated_account}</BlockParagraph>
+                        <BlockParagraph>
+                            {user.last_updated_account ? now(user.last_updated_account) : 'Account updated yet.'}
+                        </BlockParagraph>
                     </div>
                     <div>
                         <BlockLabel>Last Updated Password</BlockLabel>
-                        <BlockParagraph>{user.last_updated_password}</BlockParagraph>
+                        <BlockParagraph>
+                            {user.last_updated_password ? now(user.last_updated_password) : 'Password updated yet.'}
+                        </BlockParagraph>
                     </div>
                 </div>
             </div>

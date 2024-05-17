@@ -1,3 +1,4 @@
+import { Toaster as Sonner } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/services/providers/theme-provider';
 import NextTopLoader from 'nextjs-toploader';
 import { type ReactElement } from 'react';
@@ -9,6 +10,7 @@ export const RootLayout = ({ children }: { children: ReactElement }) => {
             <NextTopLoader color='#3b82f6' showSpinner={false} />
             {children}
             <Toaster />
+            <Sonner />
         </ThemeProvider>
     );
 };

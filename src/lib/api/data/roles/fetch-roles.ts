@@ -19,7 +19,12 @@ export const useFetchAllRoles = () => {
         queryFn: getAllRoles,
     });
 
-    if (isError) console.error(error);
+    if (isError) {
+        console.log(error);
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(error.message);
+        }
+    }
 
     return { roles: data?.data.roles, isLoading, isError, status };
 };

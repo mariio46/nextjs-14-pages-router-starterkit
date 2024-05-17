@@ -1,9 +1,9 @@
 import { ColumnDef } from '@tanstack/react-table';
 
-import type { UsersType } from '@/types/api/data/users';
+import type { UserIndexType } from '@/types/api/data/users';
 
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
-import { acronym } from '@/lib/utils';
+import { acronym, capitalize, now } from '@/lib/utils';
 
 import { Icon } from '@/components/icon';
 import { DataTableColumnDropdownAction } from '@/components/tanstack/data-table-column-dropdown-action';
@@ -13,11 +13,11 @@ import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdow
 import Link from 'next/link';
 import { UserDeleteDialog } from './user-delete-dialog';
 
-export const usersColumns: ColumnDef<UsersType>[] = [
+export const usersColumns: ColumnDef<UserIndexType>[] = [
     {
         id: '#',
-        header: () => <div className='w-0.5 text-start'>#</div>,
-        cell: ({ row }) => <div className='w-0.5 text-start text-muted-foreground'>{row.index + 1}</div>,
+        header: () => <div className='text-center'>#</div>,
+        cell: ({ row }) => <div className='text-center text-muted-foreground'>{row.index + 1}</div>,
     },
     {
         accessorKey: 'name',
@@ -26,15 +26,21 @@ export const usersColumns: ColumnDef<UsersType>[] = [
         meta: { displayName: 'Name' },
     },
     {
+        accessorKey: 'role.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Role' />,
+        cell: ({ row }) => <div>{capitalize(row.original.role.name)}</div>,
+        meta: { displayName: 'Role' },
+    },
+    {
         accessorKey: 'verified',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Verified' />,
-        cell: ({ row }) => <div>{row.getValue('verified')}</div>,
+        cell: ({ row }) => <div>{row.original.verified?.length ? now(row.original.verified!) : 'Not verified'}</div>,
         meta: { displayName: 'Verified' },
     },
     {
         accessorKey: 'joined',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Joined' />,
-        cell: ({ row }) => <div>{row.getValue('joined')}</div>,
+        cell: ({ row }) => <div>{now(row.original.joined)}</div>,
         meta: { displayName: 'Joined' },
     },
     {
@@ -43,7 +49,7 @@ export const usersColumns: ColumnDef<UsersType>[] = [
     },
 ];
 
-const ColumnAction = ({ user }: { user: UsersType }) => {
+const ColumnAction = ({ user }: { user: UserIndexType }) => {
     const { copyUsernameToClipboard } = useCopyToClipboard();
 
     return (
@@ -76,7 +82,7 @@ const ColumnAction = ({ user }: { user: UsersType }) => {
     );
 };
 
-const ColumnUserAvatar = ({ user }: { user: UsersType }) => {
+const ColumnUserAvatar = ({ user }: { user: UserIndexType }) => {
     return (
         <div className='flex items-center gap-3 w-[400px]'>
             <div className='flex-shrink-0'>

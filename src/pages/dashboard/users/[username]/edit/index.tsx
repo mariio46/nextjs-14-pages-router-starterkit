@@ -26,6 +26,7 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 
 const UserEditPage: NextPageWithLayout<UserEditPageProps> = ({ username }) => {
     const { user, status } = useFetchSingleUser(username);
+
     const breadcrumbData = [
         {
             as: 'link',

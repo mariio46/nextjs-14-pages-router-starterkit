@@ -1,53 +1,86 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type AxiosError } from 'axios';
+import { useRouter } from 'next/router';
+
+import type { UserIndexType, UserShowType } from '@/types/api/data/users';
+import type { ApiResponse } from '@/types/api/response';
+
 import { useToast } from '@/components/ui/use-toast';
-import { useLoading } from '@/hooks/use-loading';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { FETCH_ALL_USERS_KEY } from '@/lib/query-key';
-import { ApiResponse } from '@/types/api/response';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 
-type DeleteUserResponse = ApiResponse<string | null>;
+type DeleteUserResponse = ApiResponse<string>;
+type DeleteUserErrorResponse = AxiosError<ApiResponse<string>>;
 
-export const useDeleteUser = () => {
+const submitDeletedUserToServer = async (username: string) => {
+    const response = await axios.delete<DeleteUserResponse>(`/users/${username}/delete`, getClientSideAxiosHeaders());
+    return response.data;
+};
+
+const useDeleteUserMutation = (username: string) => {
     const queryClient = useQueryClient();
 
-    const { toast } = useToast();
-    const { loading, startLoading, stopLoading } = useLoading();
-
-    const deleteUser = async (username: string) => {
-        // prettier-ignore
-        startLoading()
-        return await axios
-            .delete<DeleteUserResponse>(`/users/${username}`, getClientSideAxiosHeaders())
-            .then((res) => res.data);
-    };
-
-    const mutation = useMutation({
-        mutationFn: deleteUser,
-        onError: (error: AxiosError<DeleteUserResponse>) => {
-            toast({
-                title: 'Failed',
-                description: error.response?.data.data + ' Check again!' ?? `Something went wrong, Try again later!`,
-                variant: 'destructive',
-                duration: 10000,
-            });
-        },
-        onSuccess: (data) => {
-            toast({
-                title: 'Success',
-                description: data.data,
+    const { mutateAsync, isPending } = useMutation<DeleteUserResponse, DeleteUserErrorResponse, string>({
+        mutationKey: ['delete-user', { username: username }],
+        mutationFn: submitDeletedUserToServer,
+        onSettled: (data, error, variables, context) => {
+            queryClient.removeQueries({
+                queryKey: [FETCH_ALL_USERS_KEY, { username: variables }],
+                exact: true,
             });
             queryClient.invalidateQueries({
                 queryKey: [FETCH_ALL_USERS_KEY],
                 exact: true,
             });
         },
-        onSettled: () => setTimeout(() => stopLoading(), 2500) as unknown,
     });
 
-    // prettier-ignore
-    const handleDeleteUser = (username: string) => mutation.mutateAsync(username).then(res => res).catch(e => e)
+    return { mutateAsync, isPending };
+};
 
-    return { handleDeleteUser, isPending: mutation.isPending, isSuccess: mutation.isSuccess, loading };
+const useDeleteUserHandler = (closeDialog: () => void) => {
+    const router = useRouter();
+    const { toast } = useToast();
+
+    const handleSuccess = (response: DeleteUserResponse) => {
+        closeDialog();
+
+        toast({
+            title: 'Success',
+            description: response.data,
+        });
+
+        if (router.asPath !== '/users') router.push('/users');
+
+        return response;
+    };
+
+    const handleError = (error: DeleteUserErrorResponse) => {
+        closeDialog();
+        toast({
+            title: 'Failed',
+            description: error.message,
+            variant: 'destructive',
+            duration: 10000,
+        });
+    };
+
+    return { handleError, handleSuccess };
+};
+
+export const useDeleteUser = (user: UserShowType | UserIndexType, closeDialog: () => void) => {
+    const { mutateAsync, isPending } = useDeleteUserMutation(user.username);
+    const { handleError, handleSuccess } = useDeleteUserHandler(closeDialog);
+
+    const handleDeleteUser = async (username: string) => {
+        try {
+            const response = await mutateAsync(username);
+            handleSuccess(response);
+        } catch (error) {
+            handleError(error as DeleteUserErrorResponse);
+        }
+    };
+
+    return { handleDeleteUser, isPending };
 };

@@ -1,5 +1,5 @@
 import { useDeleteUser } from '@/lib/api/data/users/delete-user';
-import { UsersType } from '@/types/api/data/users';
+import { UserIndexType, UserShowType } from '@/types/api/data/users';
 
 import { SubmitButton } from '@/components/submit-button';
 import { Button } from '@/components/ui/button';
@@ -16,15 +16,13 @@ import {
 import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 
 interface UserDeleteDialogProps {
-    user: UsersType;
+    user: UserShowType | UserIndexType;
     children: React.ReactNode;
 }
 
 const UserDeleteDialog = ({ user, children }: UserDeleteDialogProps) => {
     const { openDialog, toggleDialog } = useToggleDialog();
-    const { handleDeleteUser, isPending, loading } = useDeleteUser();
-
-    const deleteUseAction = () => handleDeleteUser(user.username);
+    const { handleDeleteUser, isPending } = useDeleteUser(user, toggleDialog);
 
     return (
         <Dialog open={openDialog} onOpenChange={toggleDialog}>
@@ -61,8 +59,8 @@ const UserDeleteDialog = ({ user, children }: UserDeleteDialogProps) => {
                     </DialogClose>
                     <SubmitButton
                         type='button'
-                        onClick={deleteUseAction}
-                        disabledWhen={isPending || loading}
+                        onClick={() => handleDeleteUser(user.username)}
+                        disabledWhen={isPending}
                         defaultLabel='Delete'
                         onLoadingLabel='Deleting...'
                         variant='destructive'

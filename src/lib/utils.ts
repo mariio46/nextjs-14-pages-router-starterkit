@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
 export const cn = (...inputs: ClassValue[]) => {
@@ -33,4 +33,8 @@ export const diffForHumans = (date: string | Date, capitalizeFirstWord: boolean 
 
 export const capitalize = (value: string): string => {
     return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+export const now = (value: string) => {
+    return format(new Date(value), 'PPpp');
 };

@@ -1,4 +1,4 @@
-import { SingleUserType } from '@/types/api/data/users';
+import { UserShowType } from '@/types/api/data/users';
 
 import { useEditUser } from '@/lib/api/data/users/edit-user';
 
@@ -6,7 +6,7 @@ import { SubmitButton } from '@/components/submit-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-export const UserEditForm = ({ user }: { user: SingleUserType }) => {
+export const UserEditForm = ({ user }: { user: UserShowType }) => {
     const { form, isPending, submit } = useEditUser(user);
 
     return (

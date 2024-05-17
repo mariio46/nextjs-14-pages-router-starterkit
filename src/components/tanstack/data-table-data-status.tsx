@@ -16,7 +16,7 @@ const DataTableStatus: React.FC<DataTableStatusProps> = ({ colSpan = 5, status, 
                 colSpan={colSpan}
                 className={cn(
                     'text-center text-balance h-16 font-semibold tracking-wider [&>svg]:inline-flex',
-                    status === 'pending' ? 'text-yellow-500' : 'text-red-500',
+                    status === 'pending' ? 'text-foreground' : 'text-red-500',
                 )}
                 {...props}>
                 {status === 'pending' && <IconLoader className='animate-spin' />}

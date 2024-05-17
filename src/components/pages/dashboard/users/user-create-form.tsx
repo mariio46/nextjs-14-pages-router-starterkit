@@ -4,13 +4,15 @@ import { Input } from '@/components/ui/input';
 import { useCreateUser } from '@/lib/api/data/users/create-user';
 
 export const UserCreateForm = () => {
-    const { submit, isPending, form } = useCreateUser();
+    const { submit, form } = useCreateUser();
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)} className='space-y-4'>
-                {/* prettier-ignore */}
-                <FormField control={form.control} name='name' render={({ field }) => (
+                <FormField
+                    control={form.control}
+                    name='name'
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Name</FormLabel>
                             <FormControl>
@@ -20,8 +22,10 @@ export const UserCreateForm = () => {
                         </FormItem>
                     )}
                 />
-                {/* prettier-ignore */}
-                <FormField control={form.control} name='email' render={({ field }) => (
+                <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
@@ -31,8 +35,10 @@ export const UserCreateForm = () => {
                         </FormItem>
                     )}
                 />
-                {/* prettier-ignore */}
-                <FormField control={form.control} name='password' render={({ field }) => (
+                <FormField
+                    control={form.control}
+                    name='password'
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
@@ -42,19 +48,30 @@ export const UserCreateForm = () => {
                         </FormItem>
                     )}
                 />
-                {/* prettier-ignore */}
-                <FormField control={form.control} name='password_confirmation' render={({ field }) => (
+                <FormField
+                    control={form.control}
+                    name='password_confirmation'
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Confirm Password</FormLabel>
                             <FormControl>
-                                <Input type='password' aria-label='Password Confirmation' autoComplete='new-password' {...field} />
+                                <Input
+                                    type='password'
+                                    aria-label='Password Confirmation'
+                                    autoComplete='new-password'
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                <SubmitButton disabledWhen={isPending} defaultLabel='Save' onLoadingLabel='Saving...' />
+                <SubmitButton
+                    disabledWhen={form.formState.isSubmitting}
+                    defaultLabel='Save'
+                    onLoadingLabel='Saving...'
+                />
             </form>
         </Form>
     );

@@ -5,6 +5,7 @@ import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchAllUsers } from '@/lib/api/data/users/fetch-users';
 
+import { Icon } from '@/components/icon';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { FirstShell } from '@/components/layouts/shells/first-shell';
@@ -36,7 +37,10 @@ const Users: NextPageWithLayout<UsersPageProps> = () => {
                     title='Users'
                     description='list of all users, you can create, update, and delete user you choose.'
                 />
-                <Link href='/users/create'>Create User</Link>
+                <Link href='/users/create'>
+                    <Icon name='IconCirclePlus' className='me-1' />
+                    Create User
+                </Link>
             </FirstShell.HeaderContainer>
 
             <section id='users-table' className='my-5'>

@@ -5,12 +5,11 @@ import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
 import { useFetchSingleUser } from '@/lib/api/data/users/fetch-users';
 
-import { Icon } from '@/components/icon';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { Link } from '@/components/link';
+import { UserDetailAction } from '@/components/pages/dashboard/users/detail/user-detail-action';
 import { UserDetailBlocks } from '@/components/pages/dashboard/users/detail/user-detail-blocks';
 import { UserDetailSkeleton } from '@/components/pages/dashboard/users/detail/user-detail-skeleton';
 
@@ -51,10 +50,7 @@ const UserDetailPage: NextPageWithLayout<UserDetailPageProps> = ({ username }) =
                     description='Detail user that contain their information.'
                 />
 
-                <Link href={`/users/${username}/edit`}>
-                    <Icon name='IconEdit' className='me-1' />
-                    Edit User
-                </Link>
+                <UserDetailAction user={user!} status={status} />
             </SecondShell.HeaderContainer>
 
             <section id='detail-user'>
