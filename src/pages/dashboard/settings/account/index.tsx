@@ -7,20 +7,18 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { BreadcrumbDataType, ShellBreadcrumb } from '@/components/layouts/shells/shell-breadcrumb';
-import { UpdateAccountForm } from '@/components/pages/dashboard/settings/account/form';
+import { UpdateAccountForm } from '@/components/pages/dashboard/settings/account/update-account-form';
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
 
-    if (!token_status.authenticated) {
-        return RedirectIfUnauthencated;
-    }
+    if (!token_status.authenticated) return RedirectIfUnauthencated;
 
     return { props: {} };
 }) satisfies GetServerSideProps;
 
 const Account: NextPageWithLayout = () => {
-    const data = [
+    const breadcrumbData = [
         {
             as: 'link',
             link: '/settings',
@@ -34,16 +32,14 @@ const Account: NextPageWithLayout = () => {
 
     return (
         <SecondShell>
-            <ShellBreadcrumb data={data} />
+            <ShellBreadcrumb data={breadcrumbData} />
             <SecondShell.Header
                 title='Account Information'
                 description='Update your name, username, and email to update your profile information.'
             />
 
-            <section id='update-account-form'>
-                <div className='max-w-xl'>
-                    <UpdateAccountForm />
-                </div>
+            <section className='max-w-xl' id='update-account-form'>
+                <UpdateAccountForm />
             </section>
         </SecondShell>
     );
