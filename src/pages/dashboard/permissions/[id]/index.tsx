@@ -46,6 +46,7 @@ const PermissionDetailPage: NextPageWithLayout<PermissionDetailPageProps> = ({ i
                 <SecondShell.Header
                     title='Detail Permission'
                     description='Detail permission that contain their information like role that permission have .'
+                    className='my-0'
                 />
                 <PermissionDetailAction permission={permission!} status={status} />
             </SecondShell.HeaderContainer>

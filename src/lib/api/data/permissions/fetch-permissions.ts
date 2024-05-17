@@ -27,7 +27,7 @@ export const useFetchAllPermissions = () => {
     });
 
     if (isError) {
-        console.log(error);
+        console.error(error);
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }
@@ -43,7 +43,7 @@ export const useFetchSinglePermission = (id: string) => {
     });
 
     if (isError) {
-        console.log({ error_fetch_single_permission: error });
+        console.error({ error_fetch_single_permission: error });
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }

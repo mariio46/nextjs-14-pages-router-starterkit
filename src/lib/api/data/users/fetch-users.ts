@@ -22,7 +22,7 @@ export const useFetchAllUsers = () => {
     });
 
     if (isError) {
-        console.log({ error_fetch_all_users: error });
+        console.error({ error_fetch_all_users: error });
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }
@@ -38,7 +38,7 @@ export const useFetchSingleUser = (username: string) => {
     });
 
     if (isError) {
-        console.log({ error_fetch_single_user: error });
+        console.error({ error_fetch_single_user: error });
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }

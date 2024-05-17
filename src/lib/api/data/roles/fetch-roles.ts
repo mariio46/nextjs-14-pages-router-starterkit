@@ -20,7 +20,7 @@ export const useFetchAllRoles = () => {
     });
 
     if (isError) {
-        console.log(error);
+        console.error(error);
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }
@@ -31,12 +31,12 @@ export const useFetchAllRoles = () => {
 
 export const useFetchSingleRole = (id: string) => {
     const { data, isLoading, isError, error, status } = useQuery<FetchSingleRoleResponse, AxiosError>({
-        queryKey: [FETCH_ALL_ROLES_KEY, `role-with-id-${id}`],
+        queryKey: [FETCH_ALL_ROLES_KEY, { id: id.toString() }],
         queryFn: () => getSingleRole(id),
     });
 
     if (isError) {
-        console.log(error);
+        console.error(error);
         if (process.env.NODE_ENV === 'production') {
             throw new Error(error.message);
         }

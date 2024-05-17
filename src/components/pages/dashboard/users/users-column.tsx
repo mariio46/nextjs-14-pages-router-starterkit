@@ -34,13 +34,17 @@ export const usersColumns: ColumnDef<UserIndexType>[] = [
     {
         accessorKey: 'verified',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Verified' />,
-        cell: ({ row }) => <div>{row.original.verified?.length ? now(row.original.verified!) : 'Not verified'}</div>,
+        cell: ({ row }) => (
+            <div className='whitespace-nowrap overflow-hidden'>
+                {row.original.verified?.length ? now(row.original.verified!) : 'Not verified'}
+            </div>
+        ),
         meta: { displayName: 'Verified' },
     },
     {
         accessorKey: 'joined',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Joined' />,
-        cell: ({ row }) => <div>{now(row.original.joined)}</div>,
+        cell: ({ row }) => <div className='whitespace-nowrap overflow-hidden'>{now(row.original.joined)}</div>,
         meta: { displayName: 'Joined' },
     },
     {

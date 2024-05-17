@@ -113,7 +113,6 @@ export const useUpdatePassword = () => {
     const { handleError, handleSuccess } = useUpdatePasswordHandler(form);
 
     const submit = async (values: UpdatePasswordFormFields) => {
-        console.log({ values });
         try {
             // prettier-ignore
             const { data } = await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())

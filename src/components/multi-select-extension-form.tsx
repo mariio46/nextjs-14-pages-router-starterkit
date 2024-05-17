@@ -28,7 +28,6 @@ export const MultiSelectForm = ({ permissions }: { permissions: { label: string;
 
     const onSubmit = async (values: FormValues) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log(values);
     };
 
     return (

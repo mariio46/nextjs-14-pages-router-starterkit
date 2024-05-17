@@ -1,7 +1,7 @@
 import { Icon } from '@/components/icon';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, diffForHumans } from '@/lib/utils';
 import { useAuthUserState } from '@/services/store/auth-user-state';
 import Link from 'next/link';
 
@@ -22,7 +22,9 @@ export const SettingsCards: React.FC = () => {
                 </CardHeader>
                 <CardContent className='h-[90px] flex flex-col'>
                     <p className='mb-4 flex-1 text-sm text-muted-foreground line-clamp-2'>
-                        {user.last_updated_account}
+                        {user.last_updated_account
+                            ? `Last updated account is ${diffForHumans(user.last_updated_account, true)}`
+                            : 'Account not updated yet!'}
                     </p>
                 </CardContent>
                 <CardFooter>
@@ -38,8 +40,9 @@ export const SettingsCards: React.FC = () => {
                 </CardHeader>
                 <CardContent className='h-[90px] flex flex-col'>
                     <p className='mb-4 flex-1 text-sm text-muted-foreground line-clamp-2'>
-                        {/* Becarefull, you will be logout after updating password. */}
-                        {user?.last_updated_password}
+                        {user.last_updated_password
+                            ? `Last updated password is ${diffForHumans(user.last_updated_password, true)}`
+                            : 'Password not updated yet!'}
                     </p>
                 </CardContent>
                 <CardFooter>

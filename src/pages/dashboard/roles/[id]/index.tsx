@@ -42,13 +42,14 @@ const RoleDetailPage: NextPageWithLayout<RoleDetailPageProps> = ({ id: roleId })
     return (
         <SecondShell>
             <ShellBreadcrumb data={breadcrumbData} />
-            <div className='flex items-center flex-wrap justify-between'>
+            <SecondShell.HeaderContainer>
                 <SecondShell.Header
+                    className='my-0'
                     title='Detail Role'
                     description='Detail role that contain their information like permission that role have and which user is assign to this role.'
                 />
                 <RoleDetailAction role={role!} />
-            </div>
+            </SecondShell.HeaderContainer>
 
             <section id='detail-role'>
                 <RoleDetailBlocks role={role!} status={status} />

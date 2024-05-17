@@ -13,7 +13,7 @@ export const GuestLayout = ({ children, title }: { children: ReactElement; title
             <Link className='mb-5' href='/'>
                 <ApplicationLogo className='h-12 w-auto' />
             </Link>
-            <div className='max-w-xl min-w-[36rem]'>{children}</div>
+            <div className='w-full sm:max-w-xl sm:min-w-[36rem]'>{children}</div>
             <div className='absolute bottom-2 right-2'>
                 <ThemeToggle />
             </div>

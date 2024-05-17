@@ -1,4 +1,4 @@
-import { useCreateNewRole } from '@/lib/api/data/roles/create-role';
+import { useCreateRole } from '@/lib/api/data/roles/create-role';
 import { MultipleSelectOption } from '@/lib/schema/multiple-select-option-schema';
 
 import { Icon } from '@/components/icon';
@@ -12,7 +12,7 @@ interface RoleCreateFormProps {
 }
 
 export const RoleCreateForm = ({ formData }: RoleCreateFormProps) => {
-    const { asyncSubmit, form } = useCreateNewRole();
+    const { asyncSubmit, form } = useCreateRole();
 
     return (
         <Form {...form}>

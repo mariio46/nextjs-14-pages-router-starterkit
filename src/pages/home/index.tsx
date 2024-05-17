@@ -2,9 +2,10 @@ import { type NextPageWithLayout } from '../_app';
 
 import { AppLayout } from '@/components/layouts/app-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
+import { HomePage } from '@/components/pages/home/home-page';
 
 const Home: NextPageWithLayout = () => {
-    return <div className='flex h-full items-center gap-6 justify-center'></div>;
+    return <HomePage />;
 };
 
 Home.getLayout = function getLayout(page: React.ReactElement) {
