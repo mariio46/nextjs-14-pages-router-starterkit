@@ -14,7 +14,13 @@ import { z } from 'zod';
 type EditProductResponse = ApiResponse<{ product: BaseProductType }>;
 
 type EditProductErrorResponse = AxiosError<
-    ApiValidationErrorResponse<{ name?: string[]; description?: string[]; price?: string[] }>
+    ApiValidationErrorResponse<{
+        name?: string[];
+        description?: string[];
+        price?: string[];
+        category?: string[];
+        type?: string[];
+    }>
 >;
 
 const editProductFormSchema = z.object({
@@ -32,6 +38,8 @@ const editProductFormSchema = z.object({
         .min(500, 'The price field must be at least Rp 500')
         .max(100000, 'The price field may not be greater than Rp 100.000')
         .default(500),
+    category: z.string({ required_error: 'The category field is required.' }),
+    type: z.string({ required_error: 'The type field is required.' }),
 });
 
 type EditProductFormFields = z.infer<typeof editProductFormSchema>;
@@ -58,9 +66,25 @@ const useEditProductMutation = (product: BaseProductType) => {
                     queryKey: ['products', { id: variables.id.toString() }],
                     exact: true,
                 });
+                queryClient.invalidateQueries({
+                    queryKey: ['categories', { id: variables.product.category.toString() }],
+                    exact: true,
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['types', { id: variables.product.type.toString() }],
+                    exact: true,
+                });
 
                 queryClient.invalidateQueries({
                     queryKey: ['products'],
+                    exact: true,
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['categories'],
+                    exact: true,
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['types'],
                     exact: true,
                 });
             },
@@ -79,6 +103,8 @@ const useEditProductHandler = (form: UseFormReturn<EditProductFormFields>) => {
             name: response.data.product.name,
             description: response.data.product.description,
             price: parseInt(response.data.product.price),
+            category: response.data.product.category.id.toString(),
+            type: response.data.product.type.id.toString(),
         });
 
         router.push(`/products/${response.data.product.id}`);
@@ -103,6 +129,12 @@ const useEditProductHandler = (form: UseFormReturn<EditProductFormFields>) => {
             if (errors?.price) {
                 form.setError('price', { message: errors.price[0] }, { shouldFocus: true });
             }
+            if (errors?.category) {
+                form.setError('category', { message: errors.category[0] }, { shouldFocus: true });
+            }
+            if (errors?.type) {
+                form.setError('type', { message: errors.type[0] }, { shouldFocus: true });
+            }
         } else {
             toast(
                 toastFailedMessage(error, {
@@ -122,6 +154,8 @@ export const useEditProduct = (product: BaseProductType) => {
             name: product.name,
             description: product.description,
             price: parseInt(product.price),
+            category: product.category.id.toString(),
+            type: product.type.id.toString(),
         },
     });
 

@@ -9,7 +9,9 @@ import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/s
 import { ProductEditForm } from '@/components/pages/dashboard/products/product-edit-form';
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
+import { useCategoriesFormData } from '@/lib/api/data/categories/fetch-categories';
 import { useFetchSingleProduct } from '@/lib/api/data/products/fetch-products';
+import { useTypesFormData } from '@/lib/api/data/types/fetch-types';
 
 type ProductEditPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -25,6 +27,8 @@ export const getServerSideProps = (async ({ req, res, query }) => {
 
 const ProductEditPage: NextPageWithLayout<ProductEditPageProps> = ({ id: productId }) => {
     const { product, status } = useFetchSingleProduct(productId);
+    const { formData: categoriesFormData } = useCategoriesFormData();
+    const { formData: typesFormData } = useTypesFormData();
 
     const breadcrumbData = [
         {
@@ -49,10 +53,10 @@ const ProductEditPage: NextPageWithLayout<ProductEditPageProps> = ({ id: product
             <SecondShell.Header title='Edit Product' description='This action will be update the product you choose.' />
 
             <section id='edit-product-form' className='max-w-xl'>
-                {status !== 'success' || !product ? (
-                    <FormSkeleton inputLength={3} />
+                {product && typesFormData && categoriesFormData ? (
+                    <ProductEditForm categories={categoriesFormData} types={typesFormData} product={product} />
                 ) : (
-                    <ProductEditForm product={product} />
+                    <FormSkeleton inputLength={5} />
                 )}
             </section>
         </SecondShell>

@@ -45,3 +45,18 @@ export const useFetchSingleCategory = (id: string) => {
 
     return { category: data?.data.category, isError, isLoading, error, status };
 };
+
+export const useCategoriesFormData = () => {
+    const { categories, status } = useFetchAllCategories();
+
+    const formData =
+        categories &&
+        categories.map((category) => {
+            return {
+                label: category.name,
+                value: category.id.toString(),
+            } as const;
+        });
+
+    return { formData, status };
+};

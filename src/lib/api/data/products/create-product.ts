@@ -15,7 +15,13 @@ import { useRouter } from 'next/router';
 type CreateProductResponse = ApiResponse<{ product: BaseProductType }>;
 
 type CreateProductErrorResponse = AxiosError<
-    ApiValidationErrorResponse<{ name?: string[]; description?: string[]; price?: string[] }>
+    ApiValidationErrorResponse<{
+        name?: string[];
+        description?: string[];
+        price?: string[];
+        category?: string[];
+        type?: string[];
+    }>
 >;
 
 const createProductFormSchema = z.object({
@@ -33,6 +39,8 @@ const createProductFormSchema = z.object({
         .min(500, 'The price field must be at least Rp 500')
         .max(100000, 'The price field may not be greater than Rp 100.000')
         .default(500),
+    category: z.string({ required_error: 'The category field is required.' }),
+    type: z.string({ required_error: 'The type field is required.' }),
 });
 
 type CreateProductFormFields = z.infer<typeof createProductFormSchema>;
@@ -52,6 +60,14 @@ const useCreateProductMutation = () => {
         onSuccess: (data, variables, context) => {
             queryClient.invalidateQueries({
                 queryKey: ['products'],
+                exact: true,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['categories'],
+                exact: true,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['types'],
                 exact: true,
             });
         },
@@ -89,6 +105,12 @@ const useCreateProductHandler = (form: UseFormReturn<CreateProductFormFields>) =
             if (errors?.price) {
                 form.setError('price', { message: errors.price[0] }, { shouldFocus: true });
             }
+            if (errors?.category) {
+                form.setError('category', { message: errors.category[0] }, { shouldFocus: true });
+            }
+            if (errors?.type) {
+                form.setError('type', { message: errors.type[0] }, { shouldFocus: true });
+            }
         } else {
             console.log({ error });
             toast({
@@ -110,6 +132,8 @@ export const useCreateProduct = () => {
             name: '',
             description: '',
             price: 500,
+            category: '',
+            type: '',
         },
     });
 

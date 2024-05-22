@@ -47,3 +47,18 @@ export const useFetchSingleType = (id: string) => {
 
     return { type: data?.data.type, isError, isLoading, error, status };
 };
+
+export const useTypesFormData = () => {
+    const { types, status } = useFetchAllTypes();
+
+    const formData =
+        types &&
+        types.map((type) => {
+            return {
+                label: type.name,
+                value: type.id.toString(),
+            } as const;
+        });
+
+    return { formData, status };
+};
