@@ -17,7 +17,7 @@ const SecondShellHeader = ({ title, description, className, ...props }: SecondSh
 
 const SecondShellHeaderContainerAction = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
-        <div className={cn('flex flex-wrap gap-2.5 items-center justify-between', className)} {...props}>
+        <div className={cn('flex flex-wrap gap-2.5 my-5 items-center justify-between', className)} {...props}>
             {children}
         </div>
     );

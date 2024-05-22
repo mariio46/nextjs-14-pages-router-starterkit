@@ -1,17 +1,16 @@
+import { type NextPageWithLayout } from '@/pages/_app';
+
 import { GuestLayout } from '@/components/layouts/guest-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { RegisterForm } from '@/components/pages/register/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { NextPageWithLayout } from '@/pages/_app';
 
 const Register: NextPageWithLayout = () => {
     return (
         <Card className='border-none shadow-none'>
             <CardHeader>
                 <CardTitle>Register</CardTitle>
-                <CardDescription>
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vel, beatae.
-                </CardDescription>
+                <CardDescription>Enter your personal data and join with us.</CardDescription>
             </CardHeader>
             <CardContent>
                 <RegisterForm />

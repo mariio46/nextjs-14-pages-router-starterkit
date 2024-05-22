@@ -14,7 +14,7 @@ type UserCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
-    const permission_status = await useCheckPermission('management users', { req, res });
+    const permission_status = await useCheckPermission(['management admin', 'management member'], { req, res });
 
     if (!token_status.authenticated) return RedirectIfUnauthencated;
     if (!permission_status.authorized) return RedirectIfUnauthorized;

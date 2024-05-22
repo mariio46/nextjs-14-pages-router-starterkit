@@ -1,5 +1,5 @@
 import { DataTableColumnHeader } from '@/components/tanstack/data-table-column-header';
-import { diffForHumans } from '@/lib/utils';
+import { now } from '@/lib/utils';
 import { RoleShowPermissionType } from '@/types/api/data/roles';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
@@ -7,8 +7,8 @@ import Link from 'next/link';
 export const roleDetailPermissionsColumn: ColumnDef<RoleShowPermissionType>[] = [
     {
         id: '#',
-        header: () => <div className='w-0.5 text-start'>#</div>,
-        cell: ({ row }) => <div className='w-0.5 text-start text-muted-foreground'>{row.index + 1}</div>,
+        header: () => <div className='text-center'>#</div>,
+        cell: ({ row }) => <div className='text-center text-muted-foreground'>{row.index + 1}</div>,
     },
     {
         accessorKey: 'name',
@@ -16,7 +16,7 @@ export const roleDetailPermissionsColumn: ColumnDef<RoleShowPermissionType>[] = 
         cell: ({ row }) => {
             const permission = row.original;
             return (
-                <div>
+                <div className='whitespace-nowrap overflow-hidden'>
                     <Link href={`/permissions/${permission.id}`} className='font-medium capitalize hover:underline'>
                         {permission.name}
                     </Link>
@@ -28,11 +28,11 @@ export const roleDetailPermissionsColumn: ColumnDef<RoleShowPermissionType>[] = 
     {
         accessorKey: 'created',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
-        cell: ({ row }) => <div>{diffForHumans(row.original.created, true)}</div>,
+        cell: ({ row }) => <div className='whitespace-nowrap overflow-hidden'>{now(row.original.created)}</div>,
     },
     {
         accessorKey: 'updated',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Updated' />,
-        cell: ({ row }) => <div>{diffForHumans(row.original.updated, true)}</div>,
+        cell: ({ row }) => <div className='whitespace-nowrap overflow-hidden'>{now(row.original.updated)}</div>,
     },
 ];

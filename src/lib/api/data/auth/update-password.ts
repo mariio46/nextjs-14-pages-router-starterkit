@@ -1,91 +1,87 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
-
+import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
+import type { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 import { BE_UPDATE_PASSWORD } from '../../end-point';
 import { TOKEN_COOKIE_KEY } from '../../key';
 
-import { useToast } from '@/components/ui/use-toast';
-
 type UpdatePasswordResponse = ApiResponse<null>;
 
-type UpdatePasswordErrorResponse = ApiValidationErrorResponse<{ current_password?: string[]; password?: string[] }>;
+type UpdatePasswordErrorResponse = AxiosError<
+    ApiValidationErrorResponse<{ current_password?: string[]; password?: string[] }>
+>;
 
-// prettier-ignore
-const updatePasswordFormSchema = z.object({
-    current_password: z.string({
-        required_error: 'Current Password is required.',
-        invalid_type_error: 'Current Password must be a string.',
-    }).min(1,{ message: 'Current Password is required.' }),
-    password: z.string({
-        required_error: 'New Password is required.',
-        invalid_type_error: 'New Password must be a string.',
-    }).min(8, { message: 'New Password field must be at least 8 characters.' }),
-    password_confirmation: z.string({
-        required_error: 'Password Confirmation is required.',
-        invalid_type_error: 'Password Confirmation must be a string.',
-    }).min(8, { message: 'Password Confirmation field must be at least 8 characters.' }),
-}).refine((fields) => fields.password === fields.password_confirmation, {
-    message: "Password field confirmation does not match.",
-    path: ['password'],
-})
+const updatePasswordFormSchema = z
+    .object({
+        current_password: z
+            .string({
+                required_error: 'Current Password is required.',
+                invalid_type_error: 'Current Password must be a string.',
+            })
+            .min(1, { message: 'Current Password is required.' }),
+        password: z
+            .string({
+                required_error: 'New Password is required.',
+                invalid_type_error: 'New Password must be a string.',
+            })
+            .min(8, { message: 'New Password field must be at least 8 characters.' }),
+        password_confirmation: z
+            .string({
+                required_error: 'Password Confirmation is required.',
+                invalid_type_error: 'Password Confirmation must be a string.',
+            })
+            .min(8, { message: 'Password Confirmation field must be at least 8 characters.' }),
+    })
+    .refine((fields) => fields.password === fields.password_confirmation, {
+        message: 'Password field confirmation does not match.',
+        path: ['password'],
+    })
+    .refine((fields) => fields.password !== fields.current_password, {
+        message: 'Current password cannot be same with new password',
+        path: ['password'],
+    });
 
 type UpdatePasswordFormFields = z.infer<typeof updatePasswordFormSchema>;
 
-export const useUpdatePassword = () => {
-    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+const useUpdatePasswordHandler = (form: UseFormReturn<UpdatePasswordFormFields>) => {
+    const router = useRouter();
 
     const { mutate } = useSWRConfig();
 
-    const router = useRouter();
+    const setAuthCheck = useAuthUserState((state) => state.setCheck);
+    const setAuthUser = useAuthUserState((state) => state.setUser);
+
     const { toast } = useToast();
 
-    const form = useForm<UpdatePasswordFormFields>({
-        resolver: zodResolver(updatePasswordFormSchema),
-        defaultValues: {
-            current_password: '',
-            password: '',
-            password_confirmation: '',
-        },
-    });
-
-    // prettier-ignore
-    const disabled: boolean = !form.formState.isDirty || form.formState.isSubmitting || form.formState.isSubmitSuccessful;
-
-    // prettier-ignore
-    const submit = async (values: UpdatePasswordFormFields): Promise<void> => {
-        await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
-            .then((response) => handleWhenUpdatingPasswordIsSuccess(response.data))
-            .catch((e: AxiosError<UpdatePasswordErrorResponse>) => handleWhenUpdatingPasswordIsFailed(e));
-    };
-
-    const handleWhenUpdatingPasswordIsSuccess = (data: UpdatePasswordResponse): void => {
+    const handleSuccess = (data: UpdatePasswordResponse) => {
         form.reset();
-
-        toast({
-            title: 'Success',
-            description: data.message,
-        });
 
         deleteCookie(TOKEN_COOKIE_KEY);
 
         setAuthCheck(false);
+        setAuthUser(undefined);
 
         mutate('/user', undefined);
+
+        toast({
+            title: 'Success',
+            description: 'Your password is updated successfully, please login again.',
+            duration: 10000,
+        });
 
         router.replace('/login?callback=/settings');
     };
 
-    const handleWhenUpdatingPasswordIsFailed = (e: AxiosError<UpdatePasswordErrorResponse>): void => {
+    const handleError = (e: UpdatePasswordErrorResponse) => {
         if (e.response?.data.errors) {
             const error = e.response.data.errors;
             error?.current_password && form.setError('current_password', { message: error.current_password[0] });
@@ -101,5 +97,33 @@ export const useUpdatePassword = () => {
         }
     };
 
-    return { submit, form, disabled };
+    return { handleError, handleSuccess };
+};
+
+export const useUpdatePassword = () => {
+    const form = useForm<UpdatePasswordFormFields>({
+        resolver: zodResolver(updatePasswordFormSchema),
+        defaultValues: {
+            current_password: '',
+            password: '',
+            password_confirmation: '',
+        },
+    });
+
+    const { handleError, handleSuccess } = useUpdatePasswordHandler(form);
+
+    const submit = async (values: UpdatePasswordFormFields) => {
+        try {
+            // prettier-ignore
+            const { data } = await axios.post<UpdatePasswordResponse>(BE_UPDATE_PASSWORD, values, getClientSideAxiosHeaders())
+            handleSuccess(data);
+        } catch (error) {
+            handleError(error as UpdatePasswordErrorResponse);
+        }
+    };
+
+    // prettier-ignore
+    const disabled: boolean = !form.formState.isDirty || form.formState.isSubmitting || form.formState.isSubmitSuccessful;
+
+    return { form, submit, disabled };
 };

@@ -28,11 +28,15 @@ export const UserDetailBlocks: React.FC<UserDetailBlocksProps> = ({ user }) => {
                         <BlockParagraph>{user.email}</BlockParagraph>
                     </div>
                     <div>
-                        <BlockLabel>Verified at</BlockLabel>
-                        <BlockParagraph>{user.verified ? now(user.verified) : 'Not verified'}</BlockParagraph>
+                        <BlockLabel>Role</BlockLabel>
+                        <BlockParagraph>{user.role.name}</BlockParagraph>
                     </div>
                 </div>
                 <div>
+                    <div>
+                        <BlockLabel>Verified at</BlockLabel>
+                        <BlockParagraph>{user.verified ? now(user.verified) : 'Not verified'}</BlockParagraph>
+                    </div>
                     <div>
                         <BlockLabel>Joined</BlockLabel>
                         <BlockParagraph>{now(user.joined)}</BlockParagraph>

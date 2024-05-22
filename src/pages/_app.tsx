@@ -1,13 +1,16 @@
-import { Error } from '@/components/error';
-import { Loading } from '@/components/loading';
-import { useAuth } from '@/lib/api/data/auth/use-auth';
 import '@/styles/globals.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { type ReactElement, type ReactNode } from 'react';
+
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { Figtree } from 'next/font/google';
-import { type ReactElement, type ReactNode } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+import { Error } from '@/components/error';
+import { Loading } from '@/components/loading';
+import { useAuth } from '@/lib/api/data/auth/use-auth';
 
 const figtree = Figtree({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] });
 

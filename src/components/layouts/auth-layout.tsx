@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { type ReactElement } from 'react';
 import { Navigation } from '../navigation';
+import { ResponsiveNavigation } from '../responsive-navigation';
 import { SideNavigation } from '../side-navigation';
 
 export const AuthLayout = ({ children, title }: { children: ReactElement; title?: string }) => {
@@ -13,10 +14,11 @@ export const AuthLayout = ({ children, title }: { children: ReactElement; title?
             )}
             <div>
                 <Navigation />
+                <ResponsiveNavigation />
                 <div className='mt-20' />
                 <div className='flex'>
                     <SideNavigation />
-                    <main className='w-full p-4 lg:w-4/5 '>{children}</main>
+                    <main className='w-full p-4'>{children}</main>
                 </div>
             </div>
         </>

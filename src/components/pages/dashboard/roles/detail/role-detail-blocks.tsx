@@ -24,7 +24,7 @@ export const RoleDetailBlocks = ({ role, status }: RolesDetailBlocksProps) => {
             {status !== 'success' ? <RoleDetailSkeleton /> : <RoleDetailCardInfo role={role} />}
 
             <Tabs defaultValue='permissions'>
-                <TabsList className='max-w-[300px] w-full'>
+                <TabsList className='sm:max-w-[300px] w-full'>
                     <TabsTrigger className='w-full' value='permissions'>
                         Permissions
                     </TabsTrigger>

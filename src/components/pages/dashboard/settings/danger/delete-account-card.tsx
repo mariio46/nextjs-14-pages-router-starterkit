@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DialogDeleteAccount } from './dialog-delete-account';
+import { DeleteAccountDialog } from './delete-account-dialog';
 
-export const CardDeleteAccount = () => {
+export const DeleteAccountCard = () => {
     return (
         <Card>
             <CardHeader>
@@ -12,7 +12,7 @@ export const CardDeleteAccount = () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <DialogDeleteAccount />
+                <DeleteAccountDialog />
             </CardContent>
         </Card>
     );

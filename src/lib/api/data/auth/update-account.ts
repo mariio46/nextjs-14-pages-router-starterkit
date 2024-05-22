@@ -1,91 +1,63 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
-import { useForm } from 'react-hook-form';
+import { type AxiosError } from 'axios';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
-import { User } from '@/types/user';
+import type { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
+import type { User } from '@/types/user';
 
+import { useToast } from '@/components/ui/use-toast';
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
-import { ApiResponse, ApiValidationErrorResponse } from '@/types/api/response';
 import { BE_UPDATE_ACCOUNT } from '../../end-point';
 
-import { useToast } from '@/components/ui/use-toast';
+type UpdateAccountResponse = ApiResponse<{ user: User }>;
 
-type UpdateAccountResponse = ApiResponse<User>;
+type UpdateAccountErrorResponse = AxiosError<
+    ApiValidationErrorResponse<{
+        name?: string[];
+        username?: string[];
+        email?: string[];
+    }>
+>;
 
-type UpdateAccountErrorResponse = ApiValidationErrorResponse<{
-    name?: string[];
-    username?: string[];
-    email?: string[];
-}>;
-
-// prettier-ignore
 const updateAccountFormSchema = z.object({
-    name: z.string().min(3, { 
-            message: 'The name field must be at least 3 characters.' 
-        }),
-    username: z.string().min(5, {
-            message: 'The username field must be at least 5 characters.',
-        }).max(25, {
-            message: 'The username field must not be greater than 25 characters.',
-        }).toLowerCase(),
-    email: z.string().email({ 
-            message: 'The email field must be a valid email address.' 
-        }).toLowerCase(),
+    name: z.string().min(3, {
+        message: 'The name field must be at least 3 characters.',
+    }),
+    username: z
+        .string()
+        .min(5, { message: 'The username field must be at least 5 characters.' })
+        .max(25, { message: 'The username field must not be greater than 25 characters.' })
+        .toLowerCase(),
+    email: z.string().email({ message: 'The email field must be a valid email address.' }).toLowerCase(),
 });
 
 type UpdateAccountFormFields = z.infer<typeof updateAccountFormSchema>;
 
-export const useUpdateAccount = () => {
-    const authUser = useAuthUserState((state) => {
-        return {
-            name: state.user?.name,
-            username: state.user?.username,
-            email: state.user?.email,
-        };
-    });
-
+const useUpdateAccountHandler = (form: UseFormReturn<UpdateAccountFormFields>) => {
     const { mutate } = useSWRConfig();
 
     const { toast } = useToast();
 
-    const form = useForm<UpdateAccountFormFields>({
-        resolver: zodResolver(updateAccountFormSchema),
-        defaultValues: {
-            name: authUser?.name,
-            username: authUser?.username,
-            email: authUser?.email,
-        },
-    });
+    const handleSuccess = (user: User) => {
+        mutate('/user', user);
 
-    // prettier-ignore
-    const submit = async (values: UpdateAccountFormFields): Promise<void> => {
-        await axios.post<UpdateAccountResponse>(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders())
-            .then((response) => handleWhenUpdatingAccountIsSuccess(response.data))
-            .catch((e: AxiosError<UpdateAccountErrorResponse>) => handleWhenUpdatingAccountIsFailed(e))
-    };
-
-    const handleWhenUpdatingAccountIsSuccess = (data: UpdateAccountResponse): void => {
         form.reset({
-            name: data.data.name,
-            username: data.data.username,
-            email: data.data.email,
+            name: user.name,
+            username: user.username,
+            email: user.email,
         });
 
-        // Revalidate Auth User State
-        mutate('/user', data.data);
-
-        // Toast for showing that updating account is success
         toast({
             title: 'Success',
-            description: data.message,
+            description: 'Your account has been updated successfully.',
         });
     };
 
-    const handleWhenUpdatingAccountIsFailed = (e: AxiosError<UpdateAccountErrorResponse>): void => {
+    const handleError = (e: UpdateAccountErrorResponse) => {
         if (e.response?.data.errors) {
             const error = e.response.data.errors;
             error?.name && form.setError('name', { message: error?.name[0] });
@@ -102,5 +74,32 @@ export const useUpdateAccount = () => {
         }
     };
 
-    return { submit, form };
+    return { handleError, handleSuccess };
+};
+
+export const useUpdateAccount = () => {
+    const authUser = useAuthUserState((state) => state.user);
+
+    const form = useForm<UpdateAccountFormFields>({
+        resolver: zodResolver(updateAccountFormSchema),
+        defaultValues: {
+            name: authUser?.name,
+            username: authUser?.username,
+            email: authUser?.email,
+        },
+    });
+
+    const { handleError, handleSuccess } = useUpdateAccountHandler(form);
+
+    const submit = async (values: UpdateAccountFormFields) => {
+        try {
+            // prettier-ignore
+            const { data } = await axios.post<UpdateAccountResponse>(BE_UPDATE_ACCOUNT, values, getClientSideAxiosHeaders());
+            handleSuccess(data.data.user);
+        } catch (error) {
+            handleError(error as UpdateAccountErrorResponse);
+        }
+    };
+
+    return { form, submit };
 };

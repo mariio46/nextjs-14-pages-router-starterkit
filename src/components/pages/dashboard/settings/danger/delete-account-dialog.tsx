@@ -2,10 +2,11 @@ import { useToggleDialog } from '@/hooks/use-toggle-dialog';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FormDeleteAccount } from './form-delete-account';
+import { DeleteAccountForm } from './delete-account-form';
 
-export const DialogDeleteAccount = () => {
+export const DeleteAccountDialog = () => {
     const { openDialog, toggleDialog } = useToggleDialog();
+
     return (
         <>
             <Button variant='destructive' onClick={toggleDialog}>
@@ -20,7 +21,7 @@ export const DialogDeleteAccount = () => {
                             Please enter your password to confirm you would like to permanently delete your account.
                         </DialogDescription>
                     </DialogHeader>
-                    <FormDeleteAccount closeDialog={toggleDialog} />
+                    <DeleteAccountForm closeDialog={toggleDialog} />
                 </DialogContent>
             </Dialog>
         </>

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { RoleIndexType } from '@/types/api/data/roles';
 
-import { diffForHumans } from '@/lib/utils';
+import { now } from '@/lib/utils';
 
 import { Icon } from '@/components/icon';
 import { DataTableColumnDropdownAction } from '@/components/tanstack/data-table-column-dropdown-action';
@@ -14,8 +14,8 @@ import { RoleDeleteDialog } from './role-delete-dialog';
 export const rolesColumn: ColumnDef<RoleIndexType>[] = [
     {
         id: '#',
-        header: () => <div className='w-0.5 text-start'>#</div>,
-        cell: ({ row }) => <div className='w-0.5 text-start text-muted-foreground'>{row.index + 1}</div>,
+        header: () => <div className='text-center'>#</div>,
+        cell: ({ row }) => <div className='text-center text-muted-foreground'>{row.index + 1}</div>,
     },
     {
         accessorKey: 'name',
@@ -23,7 +23,7 @@ export const rolesColumn: ColumnDef<RoleIndexType>[] = [
         cell: ({ row }) => {
             const role = row.original;
             return (
-                <div>
+                <div className='whitespace-nowrap overflow-hidden'>
                     <Link href={`/roles/${role.id}`} className='font-medium capitalize hover:underline'>
                         {role.name}
                     </Link>
@@ -36,25 +36,29 @@ export const rolesColumn: ColumnDef<RoleIndexType>[] = [
     {
         accessorKey: 'permissions_count',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Total Permission' />,
-        cell: ({ row }) => <div>{`${row.getValue('permissions_count')} Permissions`}</div>,
+        cell: ({ row }) => (
+            <div className='whitespace-nowrap overflow-hidden'>{`${row.getValue('permissions_count')} Permissions`}</div>
+        ),
         meta: { displayName: 'Total Permissions' },
     },
     {
         accessorKey: 'users_count',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Total User' />,
-        cell: ({ row }) => <div>{`${row.getValue('users_count')} Users`}</div>,
+        cell: ({ row }) => (
+            <div className='whitespace-nowrap overflow-hidden'>{`${row.getValue('users_count')} Users`}</div>
+        ),
         meta: { displayName: 'Total Users' },
     },
     {
         accessorKey: 'created',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
-        cell: ({ row }) => <div>{diffForHumans(row.original.created, true)}</div>,
+        cell: ({ row }) => <div className='whitespace-nowrap overflow-hidden'>{now(row.original.created)}</div>,
         meta: { displayName: 'Created' },
     },
     {
         accessorKey: 'updated',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Updated' />,
-        cell: ({ row }) => <div>{diffForHumans(row.original.updated, true)}</div>,
+        cell: ({ row }) => <div className='whitespace-nowrap overflow-hidden'>{now(row.original.updated)}</div>,
         meta: { displayName: 'Updated' },
     },
     {

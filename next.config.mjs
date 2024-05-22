@@ -7,65 +7,6 @@ const nextConfig = {
      * destination: is the path you want to route to.
      * permanent true or false - if true will use the 308 status code which instructs clients/search engines to cache the redirect forever, if false will use the 307 status code which is temporary and is not cached.
      */
-    // async redirects() {
-    //     return [
-    //         {
-    //             destination: '/',
-    //             source: '/home',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/login',
-    //             source: '/guest/login',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/register',
-    //             source: '/guest/register',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/settings',
-    //             source: '/dashboard/settings',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/settings/account',
-    //             source: '/dashboard/settings/account',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/settings/security',
-    //             source: '/dashboard/settings/security',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/settings/danger',
-    //             source: '/dashboard/settings/danger',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/users',
-    //             source: '/dashboard/users',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/users/:path*',
-    //             source: '/dashboard/users/:path*',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/users/:path*/edit',
-    //             source: '/dashboard/users/:path*/edit',
-    //             permanent: true,
-    //         },
-    //         {
-    //             destination: '/users/create',
-    //             source: '/dashboard/users/create',
-    //             permanent: true,
-    //         },
-    //     ];
-    // },
     async redirects() {
         return [
             {
@@ -103,6 +44,21 @@ const nextConfig = {
                 source: '/dashboard/permissions/:path*',
                 permanent: true,
             },
+            {
+                destination: '/products/:path*',
+                source: '/dashboard/products/:path*',
+                permanent: true,
+            },
+            {
+                destination: '/categories/:path*',
+                source: '/dashboard/categories/:path*',
+                permanent: true,
+            },
+            {
+                destination: '/types/:path*',
+                source: '/dashboard/types/:path*',
+                permanent: true,
+            },
         ];
     },
 
@@ -111,54 +67,6 @@ const nextConfig = {
      * source: String - is the incoming request path pattern.
      * destination: String is the path you want to route to.
      */
-    // async rewrites() {
-    //     return [
-    //         {
-    //             source: '/',
-    //             destination: '/home',
-    //         },
-    //         {
-    //             source: '/login',
-    //             destination: '/guest/login',
-    //         },
-    //         {
-    //             source: '/register',
-    //             destination: '/guest/register',
-    //         },
-    //         {
-    //             source: '/settings',
-    //             destination: '/dashboard/settings',
-    //         },
-    //         {
-    //             source: '/settings/account',
-    //             destination: '/dashboard/settings/account',
-    //         },
-    //         {
-    //             source: '/settings/security',
-    //             destination: '/dashboard/settings/security',
-    //         },
-    //         {
-    //             source: '/settings/danger',
-    //             destination: '/dashboard/settings/danger',
-    //         },
-    //         {
-    //             source: '/users',
-    //             destination: '/dashboard/users',
-    //         },
-    //         {
-    //             source: '/users/:path*',
-    //             destination: '/dashboard/users/:path*',
-    //         },
-    //         {
-    //             source: '/users/:path*/edit',
-    //             destination: '/dashboard/users/:path*/edit',
-    //         },
-    //         {
-    //             source: '/users/create',
-    //             destination: '/dashboard/users/create',
-    //         },
-    //     ];
-    // },
     async rewrites() {
         return [
             {
@@ -188,6 +96,18 @@ const nextConfig = {
             {
                 source: '/permissions/:path*',
                 destination: '/dashboard/permissions/:path*',
+            },
+            {
+                source: '/products/:path*',
+                destination: '/dashboard/products/:path*',
+            },
+            {
+                source: '/categories/:path*',
+                destination: '/dashboard/categories/:path*',
+            },
+            {
+                source: '/types/:path*',
+                destination: '/dashboard/types/:path*',
             },
         ];
     },

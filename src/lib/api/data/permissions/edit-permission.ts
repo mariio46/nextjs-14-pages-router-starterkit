@@ -78,7 +78,7 @@ export const useEditPermission = (initialData: PermissionShowType) => {
             const errors = error.response.data.errors;
             errors?.name && form.setError('name', { message: errors.name[0] });
         } else {
-            console.log({ error });
+            console.error({ error });
         }
     };
 

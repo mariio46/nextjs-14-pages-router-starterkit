@@ -1,14 +1,18 @@
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { deleteCookie, hasCookie } from 'cookies-next';
 import useSWR from 'swr';
 
-import { ApiResponse } from '@/types/api/response';
-import { AuthUserType } from '@/types/user';
+import type { ApiResponse } from '@/types/api/response';
+import type { AuthUserType } from '@/types/user';
 
 import axios from '@/lib/axios';
 import { getClientSideAxiosHeaders } from '@/lib/cookies-next';
 import { useAuthUserState } from '@/services/store/auth-user-state';
 import { TOKEN_COOKIE_KEY } from '../../key';
+
+type DataResponse = ApiResponse<AuthUserType>;
+
+type ErrorResponse = AxiosError<{ message: string }>;
 
 const authFetcher = (url: string) => axios.get(url, getClientSideAxiosHeaders()).then((res) => res.data);
 
@@ -17,7 +21,7 @@ export const useAuth = () => {
     const setAuthCheck = useAuthUserState((state) => state.setCheck);
 
     // prettier-ignore
-    const { isLoading, isValidating, error: errorResult } = useSWR<ApiResponse<AuthUserType>, AxiosError<{ message: string }>>('/user', authFetcher, {
+    const { isLoading, isValidating, error: errorResult } = useSWR<DataResponse, ErrorResponse>('/user', authFetcher, {
             shouldRetryOnError: false,
             revalidateOnFocus: false,
             errorRetryInterval: 5000,

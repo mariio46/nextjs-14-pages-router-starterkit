@@ -22,6 +22,7 @@ import { Icon } from './icon';
 
 export const NavigationDropdown = () => {
     const user = useAuthUserState((state) => state.user);
+
     const { logout, loading } = useLogout();
 
     return (
@@ -53,14 +54,12 @@ export const NavigationDropdown = () => {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSub>
-                    <Link href='/settings' className='w-full'>
-                        <DropdownMenuSubTrigger>
-                            <Icon name='IconSettings' className='me-1.5 stroke-[1.3]' />
-                            Settings
-                        </DropdownMenuSubTrigger>
-                    </Link>
+                    <DropdownMenuSubTrigger>
+                        <Icon name='IconSettings' className='me-1.5 stroke-[1.3]' />
+                        Settings
+                    </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
-                        <DropdownMenuSubContent className='z-[62] w-[10rem]'>
+                        <DropdownMenuSubContent sideOffset={10} className='z-[62]'>
                             <DropdownMenuItem asChild>
                                 <Link href='/settings/account'>
                                     <Icon name='IconUserCircle' className='mr-1.5 stroke-[1.3]' />
@@ -84,6 +83,30 @@ export const NavigationDropdown = () => {
                     </DropdownMenuPortal>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
+                {useHasPermission('management products') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/products'>
+                            <Icon name='IconPackage' className='mr-1.5 stroke-[1.3]' />
+                            Products
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+                {useHasPermission('management categories') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/categories'>
+                            <Icon name='IconCategory' className='mr-1.5 stroke-[1.3]' />
+                            Categories
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+                {useHasPermission('management types') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/types'>
+                            <Icon name='IconTags' className='mr-1.5 stroke-[1.3]' />
+                            Types
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 {useHasPermission('management users') && (
                     <DropdownMenuItem asChild>
                         <Link href='/users'>

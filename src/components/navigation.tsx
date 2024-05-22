@@ -14,8 +14,8 @@ export const Navigation = () => {
 
     return (
         <header className='relative z-[60] hidden lg:block'>
-            <nav className='fixed left-1/2 top-0 w-full -translate-x-1/2 bg-background py-4'>
-                <div className='mx-auto flex h-14 max-w-screen-2xl items-center justify-between px-4 sm:px-6'>
+            <nav className='fixed left-1/2 top-0 w-full -translate-x-1/2 py-4 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+                <div className='mx-auto flex h-9 max-w-screen-2xl items-center justify-between px-4 sm:px-6'>
                     <NextLink href='/'>
                         <ApplicationLogo className='h-8 w-auto' />
                     </NextLink>
@@ -31,14 +31,14 @@ export const Navigation = () => {
                             {check ? (
                                 <NavigationDropdown />
                             ) : (
-                                <>
+                                <div className='flex items-center gap-2'>
                                     <Link href='/login' variant='outline'>
                                         Login
                                     </Link>
                                     <Link href='/register' variant='outline'>
                                         Register
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
