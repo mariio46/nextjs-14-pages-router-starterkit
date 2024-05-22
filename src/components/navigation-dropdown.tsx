@@ -83,6 +83,22 @@ export const NavigationDropdown = () => {
                     </DropdownMenuPortal>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
+                {useHasPermission('management products') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/products'>
+                            <Icon name='IconPackage' className='mr-1.5 stroke-[1.3]' />
+                            Products
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+                {useHasPermission('management categories') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/categories'>
+                            <Icon name='IconCategory' className='mr-1.5 stroke-[1.3]' />
+                            Categories
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 {useHasPermission('management users') && (
                     <DropdownMenuItem asChild>
                         <Link href='/users'>

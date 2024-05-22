@@ -3,59 +3,57 @@ import { type GetServerSideProps, type InferGetServerSidePropsType } from 'next'
 
 import { RedirectIfUnauthorized, useCheckPermission } from '@/lib/api/data/auth/check-permission';
 import { RedirectIfUnauthencated, authUserTokenValidation } from '@/lib/api/data/auth/redirect-if-unauthenticated';
-import { useFetchAllUsers } from '@/lib/api/data/users/fetch-users';
 
 import { Icon } from '@/components/icon';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { FirstShell } from '@/components/layouts/shells/first-shell';
 import { Link } from '@/components/link';
-import { usersColumns } from '@/components/pages/dashboard/users/users-column';
+import { productsColumn } from '@/components/pages/dashboard/products/products-column';
 import { DataTable } from '@/components/tanstack/data-table';
+import { useFetchAllProducts } from '@/lib/api/data/products/fetch-products';
 
-type UsersPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+type ProductsPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
-    const permission_status = await useCheckPermission(['management admin', 'management member'], { req, res });
+    const permission_status = await useCheckPermission('management products', { req, res });
 
     if (!token_status.authenticated) return RedirectIfUnauthencated;
     if (!permission_status.authorized) return RedirectIfUnauthorized;
 
-    return {
-        props: {},
-    };
+    return { props: {} };
 }) satisfies GetServerSideProps;
 
-const Users: NextPageWithLayout<UsersPageProps> = () => {
-    const { users, status } = useFetchAllUsers();
+const ProductsPage: NextPageWithLayout<ProductsPageProps> = () => {
+    const { products, status } = useFetchAllProducts();
 
     return (
         <FirstShell>
             <FirstShell.HeaderContainer>
                 <FirstShell.Header
-                    title='Users'
-                    description='list of all users, you can create, update, and delete user you choose.'
+                    title='Products'
+                    description='The table below is a list of all products in your app.'
                 />
-                <Link href='/users/create'>
+                <Link href='/products/create'>
                     <Icon name='IconCirclePlus' className='me-1' />
-                    Create User
+                    Create Products
                 </Link>
             </FirstShell.HeaderContainer>
 
-            <section id='users-table' className='my-5'>
-                <DataTable data={users!} columns={usersColumns} status={status} filterKey='name' />
+            <section id='products-table' className='my-5'>
+                <DataTable status={status} data={products!} columns={productsColumn} filterKey='name' />
             </section>
         </FirstShell>
     );
 };
 
-Users.getLayout = function getLayout(page: React.ReactElement) {
+ProductsPage.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthLayout title='Users'>{page}</AuthLayout>
+            <AuthLayout title='Products'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
-export default Users;
+export default ProductsPage;

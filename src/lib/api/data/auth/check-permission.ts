@@ -24,7 +24,6 @@ export const useCheckPermission = async (permissions: string[] | string, option:
         .post('/permissions-check', data, getServerSideAxiosHeaders(option.req, option.res))
         .then((res) => res.data)
         .catch((error) => error.response.data);
-
     if (check_permission.code === 401 || check_permission.code !== 200) {
         return { authorized: false }
     }

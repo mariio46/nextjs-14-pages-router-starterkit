@@ -44,6 +44,16 @@ const nextConfig = {
                 source: '/dashboard/permissions/:path*',
                 permanent: true,
             },
+            {
+                destination: '/products/:path*',
+                source: '/dashboard/products/:path*',
+                permanent: true,
+            },
+            {
+                destination: '/categories/:path*',
+                source: '/dashboard/categories/:path*',
+                permanent: true,
+            },
         ];
     },
 
@@ -81,6 +91,14 @@ const nextConfig = {
             {
                 source: '/permissions/:path*',
                 destination: '/dashboard/permissions/:path*',
+            },
+            {
+                source: '/products/:path*',
+                destination: '/dashboard/products/:path*',
+            },
+            {
+                source: '/categories/:path*',
+                destination: '/dashboard/categories/:path*',
             },
         ];
     },

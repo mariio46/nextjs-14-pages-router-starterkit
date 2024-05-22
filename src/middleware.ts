@@ -46,6 +46,8 @@ export const config = {
         '/users/:path*',
         '/roles/:path*',
         '/permissions/:path*',
+        '/products/:path*',
+        '/categories/:path*',
         '/login',
         '/register',
     ],

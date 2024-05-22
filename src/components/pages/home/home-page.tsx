@@ -11,6 +11,8 @@ export const HomePage = ({}: HomePageProps) => {
                         Kedai Kopi Pedeaem
                     </span>
                 </h1> */}
+                {/* {formatCurrency(2000.0, { decimals: 0, locale: 'id-ID' })}
+                {parseInt('2000.00')} */}
             </div>
         </div>
     );

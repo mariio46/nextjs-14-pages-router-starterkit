@@ -8,13 +8,13 @@ import { AuthLayout } from '@/components/layouts/auth-layout';
 import { RootLayout } from '@/components/layouts/root-layout';
 import { SecondShell } from '@/components/layouts/shells/second-shell';
 import { ShellBreadcrumb, type BreadcrumbDataType } from '@/components/layouts/shells/shell-breadcrumb';
-import { UserCreateForm } from '@/components/pages/dashboard/users/user-create-form';
+import { ProductCreateForm } from '@/components/pages/dashboard/products/product-create-form';
 
-type UserCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+type ProductCreatePageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export const getServerSideProps = (async ({ req, res }) => {
     const token_status = await authUserTokenValidation(req, res);
-    const permission_status = await useCheckPermission(['management admin', 'management member'], { req, res });
+    const permission_status = await useCheckPermission('management products', { req, res });
 
     if (!token_status.authenticated) return RedirectIfUnauthencated;
     if (!permission_status.authorized) return RedirectIfUnauthorized;
@@ -22,37 +22,37 @@ export const getServerSideProps = (async ({ req, res }) => {
     return { props: {} };
 }) satisfies GetServerSideProps;
 
-const UserCreatePage: NextPageWithLayout<UserCreatePageProps> = () => {
+const ProductCreatePage: NextPageWithLayout<ProductCreatePageProps> = () => {
     const breadcrumbData = [
         {
             as: 'link',
-            link: '/users',
-            title: 'Users',
+            link: '/products',
+            title: 'Products',
         },
         {
             as: 'page',
-            title: 'Create User',
+            title: 'Create Product',
         },
     ] satisfies BreadcrumbDataType[];
 
     return (
         <SecondShell>
             <ShellBreadcrumb data={breadcrumbData} />
-            <SecondShell.Header title='Create New User' description='Fill all the field below to add one user.' />
+            <SecondShell.Header title='Create New Product' description='Fill all the field below to add one product.' />
 
             <section id='create-user-form' className='max-w-xl'>
-                <UserCreateForm />
+                <ProductCreateForm />
             </section>
         </SecondShell>
     );
 };
 
-UserCreatePage.getLayout = function getLayout(page: React.ReactElement) {
+ProductCreatePage.getLayout = function getLayout(page: React.ReactElement) {
     return (
         <RootLayout>
-            <AuthLayout title='Create User'>{page}</AuthLayout>
+            <AuthLayout title='Create Product'>{page}</AuthLayout>
         </RootLayout>
     );
 };
 
-export default UserCreatePage;
+export default ProductCreatePage;

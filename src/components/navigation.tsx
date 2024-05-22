@@ -31,14 +31,14 @@ export const Navigation = () => {
                             {check ? (
                                 <NavigationDropdown />
                             ) : (
-                                <>
+                                <div className='flex items-center gap-2'>
                                     <Link href='/login' variant='outline'>
                                         Login
                                     </Link>
                                     <Link href='/register' variant='outline'>
                                         Register
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
