@@ -54,6 +54,11 @@ const nextConfig = {
                 source: '/dashboard/categories/:path*',
                 permanent: true,
             },
+            {
+                destination: '/types/:path*',
+                source: '/dashboard/types/:path*',
+                permanent: true,
+            },
         ];
     },
 
@@ -99,6 +104,10 @@ const nextConfig = {
             {
                 source: '/categories/:path*',
                 destination: '/dashboard/categories/:path*',
+            },
+            {
+                source: '/types/:path*',
+                destination: '/dashboard/types/:path*',
             },
         ];
     },

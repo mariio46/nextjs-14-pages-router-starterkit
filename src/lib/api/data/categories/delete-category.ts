@@ -43,6 +43,10 @@ const useDeleteCategoryMutation = (id: number) => {
                 queryKey: ['categories'],
                 exact: true,
             });
+            queryClient.invalidateQueries({
+                queryKey: ['types'],
+                exact: true,
+            });
         },
     });
 

@@ -99,6 +99,14 @@ export const NavigationDropdown = () => {
                         </Link>
                     </DropdownMenuItem>
                 )}
+                {useHasPermission('management types') && (
+                    <DropdownMenuItem asChild>
+                        <Link href='/types'>
+                            <Icon name='IconTags' className='mr-1.5 stroke-[1.3]' />
+                            Types
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 {useHasPermission('management users') && (
                     <DropdownMenuItem asChild>
                         <Link href='/users'>

@@ -27,6 +27,12 @@ export const SideNavigation = () => {
                             Categories
                         </SideNavigationLink>
                     )}
+                    {useHasPermission('management types') && (
+                        <SideNavigationLink href='/types'>
+                            <Icon name='IconTags' />
+                            Types
+                        </SideNavigationLink>
+                    )}
                     {useHasPermission('management users') && (
                         <SideNavigationLink href='/users'>
                             <Icon name='IconUsersGroup' />
